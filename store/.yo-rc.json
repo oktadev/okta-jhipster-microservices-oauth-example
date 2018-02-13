@@ -33,6 +33,7 @@
     ],
     "clientPackageManager": "yarn",
     "skipClient": true,
-    "skipUserManagement": true
+    "skipUserManagement": true,
+    "herokuDeployType": "git"
   }
 }
