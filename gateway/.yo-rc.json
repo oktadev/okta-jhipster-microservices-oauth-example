@@ -36,6 +36,7 @@
     "languages": [
       "en"
     ],
-    "herokuDeployType": "git"
+    "herokuDeployType": "git",
+    "herokuAppName": "okta-gateway"
   }
 }

@@ -34,6 +34,7 @@
     "clientPackageManager": "yarn",
     "skipClient": true,
     "skipUserManagement": true,
-    "herokuDeployType": "git"
+    "herokuDeployType": "git",
+    "herokuAppName": "okta-store"
   }
 }
