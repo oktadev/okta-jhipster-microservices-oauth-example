@@ -2,9 +2,7 @@
 
 This example shows how to create a microservices architecture with [JHipster](http://www.jhipster.tech) and secure it using [Okta](https://developer.okta.com).
 
-<!--
-Please read [Develop a Microservices Architecture with JHipster and OAuth]() for a tutorial that shows you how to build this application.
--->
+Please read [Develop a Microservices Architecture with OAuth 2.0 and JHipster](https://developer.okta.com/blog/2018/03/01/develop-microservices-jhipster-oauth) for a tutorial that shows you how to build this application.
 
 **Prerequisites:** [Java 8](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html),  [Node.js](https://nodejs.org/), and [Docker](https://docs.docker.com/install/).
 
@@ -66,7 +64,7 @@ This example uses the following libraries provided by open source:
 
 ## Help
 
-Please post any questions as comments on the [blog post](), or visit our [Okta Developer Forums](https://devforum.okta.com/). You can also email developers@okta.com if would like to create a support ticket.
+Please post any questions as comments on the [blog post](https://developer.okta.com/blog/2018/03/01/develop-microservices-jhipster-oauth), or visit our [Okta Developer Forums](https://devforum.okta.com/). You can also email developers@okta.com if would like to create a support ticket.
 
 ## License
 
