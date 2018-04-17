@@ -18,7 +18,7 @@ Please read [Develop a Microservices Architecture with OAuth 2.0 and JHipster](h
 To install this example application, run the following commands:
 
 ```bash
-git clone git@github.com:oktadeveloper/okta-jhipster-microservices-oauth-example.git
+git clone https://github.com/oktadeveloper/okta-jhipster-microservices-oauth-example.git
 cd okta-jhipster-microservices-oauth-example
 ```
 
