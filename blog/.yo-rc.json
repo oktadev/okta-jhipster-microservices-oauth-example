@@ -4,7 +4,8 @@
       "packageName": "com.okta.developer.blog",
       "nativeLanguage": "en"
     },
-    "jhipsterVersion": "4.14.0",
+    "jhipsterVersion": "5.1.0",
+    "applicationType": "microservice",
     "baseName": "blog",
     "packageName": "com.okta.developer.blog",
     "packageFolder": "com/okta/developer/blog",
@@ -20,21 +21,17 @@
     "messageBroker": false,
     "serviceDiscoveryType": "eureka",
     "buildTool": "maven",
-    "enableSocialSignIn": false,
     "enableSwaggerCodegen": false,
-    "jwtSecretKey": "9661abf1fa95ed19b433e2738230983110232999",
+    "jwtSecretKey": "ecb37fd4dd502523d0db6d1a518adcaa8e56fa05",
     "enableTranslation": true,
-    "applicationType": "microservice",
     "testFrameworks": [],
     "jhiPrefix": "jhi",
+    "clientPackageManager": "yarn",
     "nativeLanguage": "en",
     "languages": [
       "en"
     ],
-    "clientPackageManager": "yarn",
     "skipClient": true,
-    "skipUserManagement": true,
-    "herokuDeployType": "git",
-    "herokuAppName": "okta-blog"
+    "skipUserManagement": true
   }
 }

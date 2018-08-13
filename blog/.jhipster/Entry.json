@@ -1,21 +1,5 @@
 {
-    "fluentMethods": true,
-    "relationships": [
-        {
-            "relationshipType": "many-to-one",
-            "relationshipName": "blog",
-            "otherEntityName": "blog",
-            "otherEntityField": "name"
-        },
-        {
-            "relationshipType": "many-to-many",
-            "otherEntityRelationshipName": "entry",
-            "relationshipName": "tag",
-            "otherEntityName": "tag",
-            "otherEntityField": "name",
-            "ownerSide": true
-        }
-    ],
+    "name": "Entry",
     "fields": [
         {
             "fieldName": "title",
@@ -34,17 +18,36 @@
         },
         {
             "fieldName": "date",
-            "fieldType": "ZonedDateTime",
+            "fieldType": "Instant",
             "fieldValidateRules": [
                 "required"
             ]
         }
     ],
-    "changelogDate": "20180212183924",
+    "relationships": [
+        {
+            "relationshipType": "many-to-one",
+            "relationshipName": "blog",
+            "otherEntityName": "blog",
+            "otherEntityField": "name"
+        },
+        {
+            "relationshipType": "many-to-many",
+            "otherEntityRelationshipName": "entry",
+            "relationshipName": "tag",
+            "otherEntityName": "tag",
+            "otherEntityField": "name",
+            "ownerSide": true
+        }
+    ],
+    "changelogDate": "20180813183042",
     "entityTableName": "entry",
     "dto": "no",
-    "pagination": "no",
+    "pagination": "infinite-scroll",
     "service": "no",
     "jpaMetamodelFiltering": false,
+    "fluentMethods": true,
+    "clientRootFolder": "",
+    "applications": "*",
     "microserviceName": "blog"
 }

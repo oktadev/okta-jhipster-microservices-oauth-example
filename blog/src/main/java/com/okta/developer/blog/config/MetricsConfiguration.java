@@ -1,14 +1,6 @@
 package com.okta.developer.blog.config;
 
 import io.github.jhipster.config.JHipsterProperties;
-import io.github.jhipster.config.metrics.SpectatorLogMetricWriter;
-
-import com.netflix.spectator.api.Registry;
-import org.springframework.boot.actuate.autoconfigure.ExportMetricReader;
-import org.springframework.boot.actuate.autoconfigure.ExportMetricWriter;
-import org.springframework.boot.actuate.metrics.writer.MetricWriter;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.cloud.netflix.metrics.spectator.SpectatorMetricReader;
 
 import com.codahale.metrics.JmxReporter;
 import com.codahale.metrics.JvmAttributeGaugeSet;
@@ -83,6 +75,8 @@ public class MetricsConfiguration extends MetricsConfigurerAdapter {
         metricRegistry.register(PROP_METRIC_REG_JVM_ATTRIBUTE_SET, new JvmAttributeGaugeSet());
         if (hikariDataSource != null) {
             log.debug("Monitoring the datasource");
+            // remove the factory created by HikariDataSourceMetricsPostProcessor until JHipster migrate to Micrometer
+            hikariDataSource.setMetricsTrackerFactory(null);
             hikariDataSource.setMetricRegistry(metricRegistry);
         }
         if (jHipsterProperties.getMetrics().getJmx().isEnabled()) {
@@ -101,21 +95,5 @@ public class MetricsConfiguration extends MetricsConfigurerAdapter {
                 .build();
             reporter.start(jHipsterProperties.getMetrics().getLogs().getReportFrequency(), TimeUnit.SECONDS);
         }
-    }
-
-    /* Spectator metrics log reporting */
-    @Bean
-    @ConditionalOnProperty("jhipster.logging.spectator-metrics.enabled")
-    @ExportMetricReader
-    public SpectatorMetricReader spectatorMetricReader(Registry registry) {
-        log.info("Initializing Spectator Metrics Log reporting");
-        return new SpectatorMetricReader(registry);
-    }
-
-    @Bean
-    @ConditionalOnProperty("jhipster.logging.spectator-metrics.enabled")
-    @ExportMetricWriter
-    MetricWriter metricWriter() {
-        return new SpectatorLogMetricWriter();
     }
 }

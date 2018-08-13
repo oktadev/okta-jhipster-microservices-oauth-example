@@ -1,36 +1,28 @@
 import { Component, OnInit } from '@angular/core';
 import { JhiEventManager } from 'ng-jhipster';
 
-import { Account, LoginService, Principal } from '../shared';
+import { LoginService, Principal, Account } from 'app/core';
 
 @Component({
     selector: 'jhi-home',
     templateUrl: './home.component.html',
-    styleUrls: [
-        'home.css'
-    ]
-
+    styleUrls: ['home.css']
 })
 export class HomeComponent implements OnInit {
     account: Account;
 
-    constructor(
-        private principal: Principal,
-        private loginService: LoginService,
-        private eventManager: JhiEventManager
-    ) {
-    }
+    constructor(private principal: Principal, private loginService: LoginService, private eventManager: JhiEventManager) {}
 
     ngOnInit() {
-        this.principal.identity().then((account) => {
+        this.principal.identity().then(account => {
             this.account = account;
         });
         this.registerAuthenticationSuccess();
     }
 
     registerAuthenticationSuccess() {
-        this.eventManager.subscribe('authenticationSuccess', (message) => {
-            this.principal.identity().then((account) => {
+        this.eventManager.subscribe('authenticationSuccess', message => {
+            this.principal.identity().then(account => {
                 this.account = account;
             });
         });

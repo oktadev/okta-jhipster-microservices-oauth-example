@@ -2,7 +2,6 @@ package com.okta.developer.store.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 import com.okta.developer.store.domain.Product;
-
 import com.okta.developer.store.repository.ProductRepository;
 import com.okta.developer.store.repository.search.ProductSearchRepository;
 import com.okta.developer.store.web.rest.errors.BadRequestAlertException;
@@ -84,7 +83,7 @@ public class ProductResource {
     public ResponseEntity<Product> updateProduct(@Valid @RequestBody Product product) throws URISyntaxException {
         log.debug("REST request to update Product : {}", product);
         if (product.getId() == null) {
-            return createProduct(product);
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
         Product result = productRepository.save(product);
         productSearchRepository.save(result);
@@ -118,8 +117,8 @@ public class ProductResource {
     @Timed
     public ResponseEntity<Product> getProduct(@PathVariable String id) {
         log.debug("REST request to get Product : {}", id);
-        Product product = productRepository.findOne(id);
-        return ResponseUtil.wrapOrNotFound(Optional.ofNullable(product));
+        Optional<Product> product = productRepository.findById(id);
+        return ResponseUtil.wrapOrNotFound(product);
     }
 
     /**
@@ -132,8 +131,9 @@ public class ProductResource {
     @Timed
     public ResponseEntity<Void> deleteProduct(@PathVariable String id) {
         log.debug("REST request to delete Product : {}", id);
-        productRepository.delete(id);
-        productSearchRepository.delete(id);
+
+        productRepository.deleteById(id);
+        productSearchRepository.deleteById(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id)).build();
     }
 

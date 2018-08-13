@@ -17,6 +17,8 @@ import java.util.Map;
 @Document(collection = "jhi_persistent_audit_event")
 public class PersistentAuditEvent implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     @Id
     @Field("event_id")
     private String id;

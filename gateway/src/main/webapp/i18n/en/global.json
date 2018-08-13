@@ -7,10 +7,10 @@
             "jhipster-needle-menu-add-element": "JHipster will add additional menu entries here (do not translate!)",
             "entities": {
                 "main": "Entities",
-                "blog": "Blog",
-                "entry": "Entry",
-                "tag": "Tag",
-                "product": "Product",
+                "blogBlog": "Blog",
+                "blogEntry": "Entry",
+                "blogTag": "Tag",
+                "storeProduct": "Product",
                 "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)"
             },
             "account": {
@@ -41,6 +41,8 @@
         "form": {
             "username": "Username",
             "username.placeholder": "Your username",
+            "currentpassword": "Current password",
+            "currentpassword.placeholder": "Current password",
             "newpassword": "New password",
             "newpassword.placeholder": "New password",
             "confirmpassword": "New password confirmation",
@@ -132,7 +134,8 @@
         "Size": "Field {{ fieldName }} does not meet min/max size requirements!",
         "userexists": "Login name already used!",
         "emailexists": "Email is already in use!",
-        "idexists": "A new {{ entityName }} cannot already have an ID"
+        "idexists": "A new {{ entityName }} cannot already have an ID",
+        "idnull": "Invalid ID"
     },
     "footer": "This is your footer"
 }

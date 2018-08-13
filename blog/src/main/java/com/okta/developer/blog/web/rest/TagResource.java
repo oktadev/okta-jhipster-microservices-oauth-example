@@ -2,14 +2,18 @@ package com.okta.developer.blog.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 import com.okta.developer.blog.domain.Tag;
-
 import com.okta.developer.blog.repository.TagRepository;
 import com.okta.developer.blog.repository.search.TagSearchRepository;
 import com.okta.developer.blog.web.rest.errors.BadRequestAlertException;
 import com.okta.developer.blog.web.rest.util.HeaderUtil;
+import com.okta.developer.blog.web.rest.util.PaginationUtil;
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -79,7 +83,7 @@ public class TagResource {
     public ResponseEntity<Tag> updateTag(@Valid @RequestBody Tag tag) throws URISyntaxException {
         log.debug("REST request to update Tag : {}", tag);
         if (tag.getId() == null) {
-            return createTag(tag);
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
         Tag result = tagRepository.save(tag);
         tagSearchRepository.save(result);
@@ -91,14 +95,17 @@ public class TagResource {
     /**
      * GET  /tags : get all the tags.
      *
+     * @param pageable the pagination information
      * @return the ResponseEntity with status 200 (OK) and the list of tags in body
      */
     @GetMapping("/tags")
     @Timed
-    public List<Tag> getAllTags() {
-        log.debug("REST request to get all Tags");
-        return tagRepository.findAll();
-        }
+    public ResponseEntity<List<Tag>> getAllTags(Pageable pageable) {
+        log.debug("REST request to get a page of Tags");
+        Page<Tag> page = tagRepository.findAll(pageable);
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/tags");
+        return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
+    }
 
     /**
      * GET  /tags/:id : get the "id" tag.
@@ -110,8 +117,8 @@ public class TagResource {
     @Timed
     public ResponseEntity<Tag> getTag(@PathVariable Long id) {
         log.debug("REST request to get Tag : {}", id);
-        Tag tag = tagRepository.findOne(id);
-        return ResponseUtil.wrapOrNotFound(Optional.ofNullable(tag));
+        Optional<Tag> tag = tagRepository.findById(id);
+        return ResponseUtil.wrapOrNotFound(tag);
     }
 
     /**
@@ -124,8 +131,9 @@ public class TagResource {
     @Timed
     public ResponseEntity<Void> deleteTag(@PathVariable Long id) {
         log.debug("REST request to delete Tag : {}", id);
-        tagRepository.delete(id);
-        tagSearchRepository.delete(id);
+
+        tagRepository.deleteById(id);
+        tagSearchRepository.deleteById(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
 
@@ -134,15 +142,16 @@ public class TagResource {
      * to the query.
      *
      * @param query the query of the tag search
+     * @param pageable the pagination information
      * @return the result of the search
      */
     @GetMapping("/_search/tags")
     @Timed
-    public List<Tag> searchTags(@RequestParam String query) {
-        log.debug("REST request to search Tags for query {}", query);
-        return StreamSupport
-            .stream(tagSearchRepository.search(queryStringQuery(query)).spliterator(), false)
-            .collect(Collectors.toList());
+    public ResponseEntity<List<Tag>> searchTags(@RequestParam String query, Pageable pageable) {
+        log.debug("REST request to search for a page of Tags for query {}", query);
+        Page<Tag> page = tagSearchRepository.search(queryStringQuery(query), pageable);
+        HttpHeaders headers = PaginationUtil.generateSearchPaginationHttpHeaders(query, page, "/api/_search/tags");
+        return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
 
 }

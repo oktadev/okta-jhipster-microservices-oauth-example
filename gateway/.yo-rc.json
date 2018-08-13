@@ -2,10 +2,10 @@
   "generator-jhipster": {
     "promptValues": {
       "packageName": "com.okta.developer.gateway",
-      "nativeLanguage": "en",
-      "microservicePath": "../store"
+      "nativeLanguage": "en"
     },
-    "jhipsterVersion": "4.14.0",
+    "jhipsterVersion": "5.1.0",
+    "applicationType": "gateway",
     "baseName": "gateway",
     "packageName": "com.okta.developer.gateway",
     "packageFolder": "com/okta/developer/gateway",
@@ -21,12 +21,10 @@
     "messageBroker": false,
     "serviceDiscoveryType": "eureka",
     "buildTool": "maven",
-    "enableSocialSignIn": false,
     "enableSwaggerCodegen": false,
     "clientFramework": "angularX",
     "useSass": false,
     "clientPackageManager": "yarn",
-    "applicationType": "gateway",
     "testFrameworks": [
       "protractor"
     ],
@@ -35,8 +33,6 @@
     "nativeLanguage": "en",
     "languages": [
       "en"
-    ],
-    "herokuDeployType": "git",
-    "herokuAppName": "okta-gateway"
+    ]
   }
 }

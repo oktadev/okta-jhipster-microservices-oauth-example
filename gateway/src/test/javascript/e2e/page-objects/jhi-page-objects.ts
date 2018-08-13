@@ -53,7 +53,7 @@ export class NavBarPage {
     }
 
     clickOnAdmin(entityName: string) {
-        return element(by.css('[routerLink="' + entityName + '"]')).click();
+        return element(by.css('[routerLink="admin/' + entityName + '"]')).click();
     }
 
     getSignInPage() {
@@ -113,17 +113,19 @@ export class SignInPage {
     }
 
     loginWithOAuth(username: string, password: string) {
-
         // Entering non angular site, tell webdriver to switch to synchronous mode.
         browser.waitForAngularEnabled(false);
 
-        this.username.isPresent().then(() => {
-            this.username.sendKeys(username);
-            this.password.sendKeys(password);
-            this.loginButton.click();
-        }).catch((error) => {
-            browser.waitForAngularEnabled(true);
-        });
+        this.username
+            .isPresent()
+            .then(() => {
+                this.username.sendKeys(username);
+                this.password.sendKeys(password);
+                this.loginButton.click();
+            })
+            .catch(error => {
+                browser.waitForAngularEnabled(true);
+            });
     }
 
     login() {

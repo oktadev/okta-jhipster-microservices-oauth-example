@@ -2,9 +2,9 @@ package com.okta.developer.blog.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 import com.okta.developer.blog.domain.Blog;
-
 import com.okta.developer.blog.repository.BlogRepository;
 import com.okta.developer.blog.repository.search.BlogSearchRepository;
+import com.okta.developer.blog.repository.UserRepository;
 import com.okta.developer.blog.web.rest.errors.BadRequestAlertException;
 import com.okta.developer.blog.web.rest.util.HeaderUtil;
 import io.github.jhipster.web.util.ResponseUtil;
@@ -39,9 +39,12 @@ public class BlogResource {
 
     private final BlogSearchRepository blogSearchRepository;
 
-    public BlogResource(BlogRepository blogRepository, BlogSearchRepository blogSearchRepository) {
+    private final UserRepository userRepository;
+
+    public BlogResource(BlogRepository blogRepository, UserRepository userRepository, BlogSearchRepository blogSearchRepository) {
         this.blogRepository = blogRepository;
         this.blogSearchRepository = blogSearchRepository;
+        this.userRepository = userRepository;
     }
 
     /**
@@ -57,6 +60,11 @@ public class BlogResource {
         log.debug("REST request to save Blog : {}", blog);
         if (blog.getId() != null) {
             throw new BadRequestAlertException("A new blog cannot already have an ID", ENTITY_NAME, "idexists");
+        }
+
+        if (blog.getUser() != null) {
+            // Save user in case it's new and only exists in gateway
+            userRepository.save(blog.getUser());
         }
         Blog result = blogRepository.save(blog);
         blogSearchRepository.save(result);
@@ -79,7 +87,12 @@ public class BlogResource {
     public ResponseEntity<Blog> updateBlog(@Valid @RequestBody Blog blog) throws URISyntaxException {
         log.debug("REST request to update Blog : {}", blog);
         if (blog.getId() == null) {
-            return createBlog(blog);
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+
+        if (blog.getUser() != null) {
+            // Save user in case it's new and only exists in gateway
+            userRepository.save(blog.getUser());
         }
         Blog result = blogRepository.save(blog);
         blogSearchRepository.save(result);
@@ -98,7 +111,7 @@ public class BlogResource {
     public List<Blog> getAllBlogs() {
         log.debug("REST request to get all Blogs");
         return blogRepository.findAll();
-        }
+    }
 
     /**
      * GET  /blogs/:id : get the "id" blog.
@@ -110,8 +123,8 @@ public class BlogResource {
     @Timed
     public ResponseEntity<Blog> getBlog(@PathVariable Long id) {
         log.debug("REST request to get Blog : {}", id);
-        Blog blog = blogRepository.findOne(id);
-        return ResponseUtil.wrapOrNotFound(Optional.ofNullable(blog));
+        Optional<Blog> blog = blogRepository.findById(id);
+        return ResponseUtil.wrapOrNotFound(blog);
     }
 
     /**
@@ -124,8 +137,9 @@ public class BlogResource {
     @Timed
     public ResponseEntity<Void> deleteBlog(@PathVariable Long id) {
         log.debug("REST request to delete Blog : {}", id);
-        blogRepository.delete(id);
-        blogSearchRepository.delete(id);
+
+        blogRepository.deleteById(id);
+        blogSearchRepository.deleteById(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
 

@@ -2,17 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { JhiLanguageService } from 'ng-jhipster';
 
+import { VERSION } from 'app/app.constants';
+import { JhiLanguageHelper, Principal, LoginService } from 'app/core';
 import { ProfileService } from '../profiles/profile.service';
-import { JhiLanguageHelper, Principal, LoginService } from '../../shared';
-
-import { VERSION } from '../../app.constants';
 
 @Component({
     selector: 'jhi-navbar',
     templateUrl: './navbar.component.html',
-    styleUrls: [
-        'navbar.css'
-    ]
+    styleUrls: ['navbar.css']
 })
 export class NavbarComponent implements OnInit {
     inProduction: boolean;
@@ -34,18 +31,18 @@ export class NavbarComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.languageHelper.getAll().then((languages) => {
+        this.languageHelper.getAll().then(languages => {
             this.languages = languages;
         });
 
-        this.profileService.getProfileInfo().then((profileInfo) => {
+        this.profileService.getProfileInfo().then(profileInfo => {
             this.inProduction = profileInfo.inProduction;
             this.swaggerEnabled = profileInfo.swaggerEnabled;
         });
     }
 
     changeLanguage(languageKey: string) {
-      this.languageService.changeLanguage(languageKey);
+        this.languageService.changeLanguage(languageKey);
     }
 
     collapseNavbar() {

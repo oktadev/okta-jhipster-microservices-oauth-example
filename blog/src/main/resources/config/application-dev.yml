@@ -3,8 +3,8 @@
 #
 # This configuration overrides the application.yml file.
 #
-# More information on profiles: http://www.jhipster.tech/profiles/
-# More information on configuration properties: http://www.jhipster.tech/common-application-properties/
+# More information on profiles: https://www.jhipster.tech/profiles/
+# More information on configuration properties: https://www.jhipster.tech/common-application-properties/
 # ===================================================================
 
 # ===================================================================
@@ -16,8 +16,8 @@
 logging:
     level:
         ROOT: DEBUG
-        com.okta.developer.blog: DEBUG
         io.github.jhipster: DEBUG
+        com.okta.developer.blog: DEBUG
 
 eureka:
     instance:
@@ -34,7 +34,7 @@ spring:
         restart:
             enabled: true
         livereload:
-            enabled: false # we use gulp + BrowserSync for livereload
+            enabled: false # we use Webpack dev server + BrowserSync for livereload
     jackson:
         serialization.indent_output: true
     datasource:
@@ -61,18 +61,20 @@ spring:
     data:
         elasticsearch:
             cluster-name:
-            cluster-nodes:
+            cluster-nodes: localhost:9300
             properties:
                 path:
                     logs: target/elasticsearch/log
                     data: target/elasticsearch/data
+    liquibase:
+        contexts: dev
     mail:
         host: localhost
         port: 25
         username:
         password:
     messages:
-        cache-seconds: 1
+        cache-duration: PT1S # 1 second, see the ISO 8601 standard
     thymeleaf:
         cache: false
     zipkin: # Use the "zipkin" Maven profile to have the Spring Cloud Zipkin dependencies
@@ -81,9 +83,6 @@ spring:
         locator:
             discovery:
                 enabled: true
-
-liquibase:
-    contexts: dev
 
 # ===================================================================
 # To enable SSL, generate a certificate using:
@@ -108,7 +107,7 @@ server:
 # ===================================================================
 # JHipster specific properties
 #
-# Full reference is available at: http://www.jhipster.tech/common-application-properties/
+# Full reference is available at: https://www.jhipster.tech/common-application-properties/
 # ===================================================================
 
 jhipster:
@@ -135,15 +134,8 @@ jhipster:
         from: blog@localhost
         base-url: http://127.0.0.1:8081
     metrics: # DropWizard Metrics configuration, used by MetricsConfiguration
-        jmx.enabled: true
-        graphite: # Use the "graphite" Maven profile to have the Graphite dependencies
-            enabled: false
-            host: localhost
-            port: 2003
-            prefix: blog
-        prometheus: # Use the "prometheus" Maven profile to have the Prometheus dependencies
-            enabled: false
-            endpoint: /prometheusMetrics
+        jmx:
+            enabled: true
         logs: # Reports Dropwizard metrics in the logs
             enabled: false
             report-frequency: 60 # in seconds
@@ -153,10 +145,6 @@ jhipster:
             host: localhost
             port: 5000
             queue-size: 512
-        spectator-metrics: # Reports Spectator Circuit Breaker metrics in the logs
-            enabled: false
-            # edit spring.metrics.export.delay-millis to set report frequency
-
 
 # ===================================================================
 # Application specific properties
@@ -164,7 +152,7 @@ jhipster:
 # to have type-safe configuration, like in the JHipsterProperties above
 #
 # More documentation is available at:
-# http://www.jhipster.tech/common-application-properties/
+# https://www.jhipster.tech/common-application-properties/
 # ===================================================================
 
-application:
+# application:
