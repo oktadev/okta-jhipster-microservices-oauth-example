@@ -1,12 +1,12 @@
 package com.okta.developer.blog.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
 
-import org.springframework.data.elasticsearch.annotations.Document;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -16,7 +16,6 @@ import java.util.Objects;
 @Entity
 @Table(name = "blog")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-@Document(indexName = "blog")
 public class Blog implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -35,6 +34,10 @@ public class Blog implements Serializable {
     @Size(min = 2)
     @Column(name = "handle", nullable = false)
     private String handle;
+
+    @ManyToOne
+    @JsonIgnoreProperties("")
+    private User user;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
@@ -69,6 +72,19 @@ public class Blog implements Serializable {
 
     public void setHandle(String handle) {
         this.handle = handle;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public Blog user(User user) {
+        this.user = user;
+        return this;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
 

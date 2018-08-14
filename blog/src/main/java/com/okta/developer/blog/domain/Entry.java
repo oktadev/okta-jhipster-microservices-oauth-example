@@ -1,14 +1,14 @@
 package com.okta.developer.blog.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
 
-import org.springframework.data.elasticsearch.annotations.Document;
 import java.io.Serializable;
-import java.time.ZonedDateTime;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Objects;
@@ -19,7 +19,6 @@ import java.util.Objects;
 @Entity
 @Table(name = "entry")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-@Document(indexName = "entry")
 public class Entry implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -33,23 +32,24 @@ public class Entry implements Serializable {
     @Column(name = "title", nullable = false)
     private String title;
 
-    @NotNull
+    
     @Lob
     @Column(name = "content", nullable = false)
     private String content;
 
     @NotNull
     @Column(name = "jhi_date", nullable = false)
-    private ZonedDateTime date;
+    private Instant date;
 
     @ManyToOne
+    @JsonIgnoreProperties("")
     private Blog blog;
 
     @ManyToMany
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     @JoinTable(name = "entry_tag",
-               joinColumns = @JoinColumn(name="entries_id", referencedColumnName="id"),
-               inverseJoinColumns = @JoinColumn(name="tags_id", referencedColumnName="id"))
+               joinColumns = @JoinColumn(name = "entries_id", referencedColumnName = "id"),
+               inverseJoinColumns = @JoinColumn(name = "tags_id", referencedColumnName = "id"))
     private Set<Tag> tags = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
@@ -87,16 +87,16 @@ public class Entry implements Serializable {
         this.content = content;
     }
 
-    public ZonedDateTime getDate() {
+    public Instant getDate() {
         return date;
     }
 
-    public Entry date(ZonedDateTime date) {
+    public Entry date(Instant date) {
         this.date = date;
         return this;
     }
 
-    public void setDate(ZonedDateTime date) {
+    public void setDate(Instant date) {
         this.date = date;
     }
 

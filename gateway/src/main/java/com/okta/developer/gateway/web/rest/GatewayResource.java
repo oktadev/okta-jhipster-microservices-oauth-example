@@ -5,12 +5,12 @@ import com.okta.developer.gateway.web.rest.vm.RouteVM;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.netflix.zuul.filters.Route;
 import org.springframework.cloud.netflix.zuul.filters.RouteLocator;
 import org.springframework.http.*;
+import org.springframework.security.access.annotation.Secured;
+import com.okta.developer.gateway.security.AuthoritiesConstants;
 import org.springframework.web.bind.annotation.*;
 
 import com.codahale.metrics.annotation.Timed;
@@ -21,8 +21,6 @@ import com.codahale.metrics.annotation.Timed;
 @RestController
 @RequestMapping("/api/gateway")
 public class GatewayResource {
-
-    private final Logger log = LoggerFactory.getLogger(GatewayResource.class);
 
     private final RouteLocator routeLocator;
 
@@ -40,6 +38,7 @@ public class GatewayResource {
      */
     @GetMapping("/routes")
     @Timed
+    @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<List<RouteVM>> activeRoutes() {
         List<Route> routes = routeLocator.getRoutes();
         List<RouteVM> routeVMs = new ArrayList<>();

@@ -4,15 +4,17 @@ import com.okta.developer.blog.BlogApp;
 
 import com.okta.developer.blog.domain.Entry;
 import com.okta.developer.blog.repository.EntryRepository;
-import com.okta.developer.blog.repository.search.EntrySearchRepository;
 import com.okta.developer.blog.web.rest.errors.ExceptionTranslator;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -24,15 +26,15 @@ import org.springframework.util.Base64Utils;
 
 import javax.persistence.EntityManager;
 import java.time.Instant;
-import java.time.ZonedDateTime;
-import java.time.ZoneOffset;
-import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 
-import static com.okta.developer.blog.web.rest.TestUtil.sameInstant;
+
 import static com.okta.developer.blog.web.rest.TestUtil.createFormattingConversionService;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -51,14 +53,13 @@ public class EntryResourceIntTest {
     private static final String DEFAULT_CONTENT = "AAAAAAAAAA";
     private static final String UPDATED_CONTENT = "BBBBBBBBBB";
 
-    private static final ZonedDateTime DEFAULT_DATE = ZonedDateTime.ofInstant(Instant.ofEpochMilli(0L), ZoneOffset.UTC);
-    private static final ZonedDateTime UPDATED_DATE = ZonedDateTime.now(ZoneId.systemDefault()).withNano(0);
+    private static final Instant DEFAULT_DATE = Instant.ofEpochMilli(0L);
+    private static final Instant UPDATED_DATE = Instant.now().truncatedTo(ChronoUnit.MILLIS);
 
     @Autowired
     private EntryRepository entryRepository;
-
-    @Autowired
-    private EntrySearchRepository entrySearchRepository;
+    @Mock
+    private EntryRepository entryRepositoryMock;
 
     @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
@@ -79,7 +80,7 @@ public class EntryResourceIntTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        final EntryResource entryResource = new EntryResource(entryRepository, entrySearchRepository);
+        final EntryResource entryResource = new EntryResource(entryRepository);
         this.restEntryMockMvc = MockMvcBuilders.standaloneSetup(entryResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)
@@ -103,7 +104,6 @@ public class EntryResourceIntTest {
 
     @Before
     public void initTest() {
-        entrySearchRepository.deleteAll();
         entry = createEntity(em);
     }
 
@@ -125,11 +125,6 @@ public class EntryResourceIntTest {
         assertThat(testEntry.getTitle()).isEqualTo(DEFAULT_TITLE);
         assertThat(testEntry.getContent()).isEqualTo(DEFAULT_CONTENT);
         assertThat(testEntry.getDate()).isEqualTo(DEFAULT_DATE);
-
-        // Validate the Entry in Elasticsearch
-        Entry entryEs = entrySearchRepository.findOne(testEntry.getId());
-        assertThat(testEntry.getDate()).isEqualTo(testEntry.getDate());
-        assertThat(entryEs).isEqualToIgnoringGivenFields(testEntry, "date");
     }
 
     @Test
@@ -157,24 +152,6 @@ public class EntryResourceIntTest {
         int databaseSizeBeforeTest = entryRepository.findAll().size();
         // set the field null
         entry.setTitle(null);
-
-        // Create the Entry, which fails.
-
-        restEntryMockMvc.perform(post("/api/entries")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(entry)))
-            .andExpect(status().isBadRequest());
-
-        List<Entry> entryList = entryRepository.findAll();
-        assertThat(entryList).hasSize(databaseSizeBeforeTest);
-    }
-
-    @Test
-    @Transactional
-    public void checkContentIsRequired() throws Exception {
-        int databaseSizeBeforeTest = entryRepository.findAll().size();
-        // set the field null
-        entry.setContent(null);
 
         // Create the Entry, which fails.
 
@@ -218,7 +195,38 @@ public class EntryResourceIntTest {
             .andExpect(jsonPath("$.[*].id").value(hasItem(entry.getId().intValue())))
             .andExpect(jsonPath("$.[*].title").value(hasItem(DEFAULT_TITLE.toString())))
             .andExpect(jsonPath("$.[*].content").value(hasItem(DEFAULT_CONTENT.toString())))
-            .andExpect(jsonPath("$.[*].date").value(hasItem(sameInstant(DEFAULT_DATE))));
+            .andExpect(jsonPath("$.[*].date").value(hasItem(DEFAULT_DATE.toString())));
+    }
+    
+    public void getAllEntriesWithEagerRelationshipsIsEnabled() throws Exception {
+        EntryResource entryResource = new EntryResource(entryRepositoryMock);
+        when(entryRepositoryMock.findAllWithEagerRelationships(any())).thenReturn(new PageImpl(new ArrayList<>()));
+
+        MockMvc restEntryMockMvc = MockMvcBuilders.standaloneSetup(entryResource)
+            .setCustomArgumentResolvers(pageableArgumentResolver)
+            .setControllerAdvice(exceptionTranslator)
+            .setConversionService(createFormattingConversionService())
+            .setMessageConverters(jacksonMessageConverter).build();
+
+        restEntryMockMvc.perform(get("/api/entries?eagerload=true"))
+        .andExpect(status().isOk());
+
+        verify(entryRepositoryMock, times(1)).findAllWithEagerRelationships(any());
+    }
+
+    public void getAllEntriesWithEagerRelationshipsIsNotEnabled() throws Exception {
+        EntryResource entryResource = new EntryResource(entryRepositoryMock);
+            when(entryRepositoryMock.findAllWithEagerRelationships(any())).thenReturn(new PageImpl(new ArrayList<>()));
+            MockMvc restEntryMockMvc = MockMvcBuilders.standaloneSetup(entryResource)
+            .setCustomArgumentResolvers(pageableArgumentResolver)
+            .setControllerAdvice(exceptionTranslator)
+            .setConversionService(createFormattingConversionService())
+            .setMessageConverters(jacksonMessageConverter).build();
+
+        restEntryMockMvc.perform(get("/api/entries?eagerload=true"))
+        .andExpect(status().isOk());
+
+            verify(entryRepositoryMock, times(1)).findAllWithEagerRelationships(any());
     }
 
     @Test
@@ -234,9 +242,8 @@ public class EntryResourceIntTest {
             .andExpect(jsonPath("$.id").value(entry.getId().intValue()))
             .andExpect(jsonPath("$.title").value(DEFAULT_TITLE.toString()))
             .andExpect(jsonPath("$.content").value(DEFAULT_CONTENT.toString()))
-            .andExpect(jsonPath("$.date").value(sameInstant(DEFAULT_DATE)));
+            .andExpect(jsonPath("$.date").value(DEFAULT_DATE.toString()));
     }
-
     @Test
     @Transactional
     public void getNonExistingEntry() throws Exception {
@@ -250,11 +257,11 @@ public class EntryResourceIntTest {
     public void updateEntry() throws Exception {
         // Initialize the database
         entryRepository.saveAndFlush(entry);
-        entrySearchRepository.save(entry);
+
         int databaseSizeBeforeUpdate = entryRepository.findAll().size();
 
         // Update the entry
-        Entry updatedEntry = entryRepository.findOne(entry.getId());
+        Entry updatedEntry = entryRepository.findById(entry.getId()).get();
         // Disconnect from session so that the updates on updatedEntry are not directly saved in db
         em.detach(updatedEntry);
         updatedEntry
@@ -274,11 +281,6 @@ public class EntryResourceIntTest {
         assertThat(testEntry.getTitle()).isEqualTo(UPDATED_TITLE);
         assertThat(testEntry.getContent()).isEqualTo(UPDATED_CONTENT);
         assertThat(testEntry.getDate()).isEqualTo(UPDATED_DATE);
-
-        // Validate the Entry in Elasticsearch
-        Entry entryEs = entrySearchRepository.findOne(testEntry.getId());
-        assertThat(testEntry.getDate()).isEqualTo(testEntry.getDate());
-        assertThat(entryEs).isEqualToIgnoringGivenFields(testEntry, "date");
     }
 
     @Test
@@ -292,11 +294,11 @@ public class EntryResourceIntTest {
         restEntryMockMvc.perform(put("/api/entries")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(entry)))
-            .andExpect(status().isCreated());
+            .andExpect(status().isBadRequest());
 
         // Validate the Entry in the database
         List<Entry> entryList = entryRepository.findAll();
-        assertThat(entryList).hasSize(databaseSizeBeforeUpdate + 1);
+        assertThat(entryList).hasSize(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -304,7 +306,7 @@ public class EntryResourceIntTest {
     public void deleteEntry() throws Exception {
         // Initialize the database
         entryRepository.saveAndFlush(entry);
-        entrySearchRepository.save(entry);
+
         int databaseSizeBeforeDelete = entryRepository.findAll().size();
 
         // Get the entry
@@ -312,30 +314,9 @@ public class EntryResourceIntTest {
             .accept(TestUtil.APPLICATION_JSON_UTF8))
             .andExpect(status().isOk());
 
-        // Validate Elasticsearch is empty
-        boolean entryExistsInEs = entrySearchRepository.exists(entry.getId());
-        assertThat(entryExistsInEs).isFalse();
-
         // Validate the database is empty
         List<Entry> entryList = entryRepository.findAll();
         assertThat(entryList).hasSize(databaseSizeBeforeDelete - 1);
-    }
-
-    @Test
-    @Transactional
-    public void searchEntry() throws Exception {
-        // Initialize the database
-        entryRepository.saveAndFlush(entry);
-        entrySearchRepository.save(entry);
-
-        // Search the entry
-        restEntryMockMvc.perform(get("/api/_search/entries?query=id:" + entry.getId()))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-            .andExpect(jsonPath("$.[*].id").value(hasItem(entry.getId().intValue())))
-            .andExpect(jsonPath("$.[*].title").value(hasItem(DEFAULT_TITLE.toString())))
-            .andExpect(jsonPath("$.[*].content").value(hasItem(DEFAULT_CONTENT.toString())))
-            .andExpect(jsonPath("$.[*].date").value(hasItem(sameInstant(DEFAULT_DATE))));
     }
 
     @Test

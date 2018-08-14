@@ -1,5 +1,6 @@
 {
     "fluentMethods": true,
+    "clientRootFolder": "",
     "relationships": [],
     "fields": [
         {
@@ -25,10 +26,10 @@
         }
     ],
     "dto": "no",
+    "searchEngine": false,
     "service": "no",
     "entityTableName": "product",
     "jpaMetamodelFiltering": false,
     "pagination": "pagination",
-    "microserviceName": "store",
-    "searchEngine": "elasticsearch"
+    "microserviceName": "store"
 }

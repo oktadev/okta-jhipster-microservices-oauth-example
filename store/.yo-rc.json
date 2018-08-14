@@ -4,7 +4,8 @@
       "packageName": "com.okta.developer.store",
       "nativeLanguage": "en"
     },
-    "jhipsterVersion": "4.14.0",
+    "jhipsterVersion": "5.1.0",
+    "applicationType": "microservice",
     "baseName": "store",
     "packageName": "com.okta.developer.store",
     "packageFolder": "com/okta/developer/store",
@@ -16,25 +17,22 @@
     "databaseType": "mongodb",
     "devDatabaseType": "mongodb",
     "prodDatabaseType": "mongodb",
-    "searchEngine": "elasticsearch",
+    "searchEngine": false,
     "messageBroker": false,
     "serviceDiscoveryType": "eureka",
     "buildTool": "maven",
-    "enableSocialSignIn": false,
     "enableSwaggerCodegen": false,
-    "jwtSecretKey": "80b1ded70f6c52da473e8a9b24ceeb5bed727e74",
+    "jwtSecretKey": "4e6b5e9a3551e5d8548af5334c8953723d76fbfd",
     "enableTranslation": true,
-    "applicationType": "microservice",
     "testFrameworks": [],
     "jhiPrefix": "jhi",
+    "clientPackageManager": "yarn",
     "nativeLanguage": "en",
     "languages": [
       "en"
     ],
-    "clientPackageManager": "yarn",
     "skipClient": true,
     "skipUserManagement": true,
-    "herokuDeployType": "git",
-    "herokuAppName": "okta-store"
+    "herokuDeployType": "git"
   }
 }

@@ -1,12 +1,12 @@
 package com.okta.developer.gateway.web.rest;
 
-import com.okta.developer.gateway.domain.User;
+import com.okta.developer.gateway.service.UserService;
+import com.okta.developer.gateway.service.dto.UserDTO;
 import com.okta.developer.gateway.web.rest.errors.InternalServerErrorException;
 
 import com.codahale.metrics.annotation.Timed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,8 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * REST controller for managing the current user's account.
@@ -25,6 +23,12 @@ import java.util.stream.Collectors;
 public class AccountResource {
 
     private final Logger log = LoggerFactory.getLogger(AccountResource.class);
+
+    private final UserService userService;
+
+    public AccountResource(UserService userService) {
+        this.userService = userService;
+    }
 
     /**
      * GET  /authenticate : check if the user is authenticated, and return its login.
@@ -49,30 +53,18 @@ public class AccountResource {
     @GetMapping("/account")
     @Timed
     @SuppressWarnings("unchecked")
-    public User getAccount(Principal principal) {
-        return Optional.ofNullable(principal)
-            .filter(it -> it instanceof OAuth2Authentication)
-            .map(it -> ((OAuth2Authentication) it).getUserAuthentication())
-            .map(authentication -> {
-                    Map<String, Object> details = (Map<String, Object>) authentication.getDetails();
-                    Boolean activated = false;
-                    if (details.get("email_verified") != null) {
-                        activated = (Boolean) details.get("email_verified");
-                    }
-                    return new User(
-                        authentication.getName(),
-                        (String) details.get("given_name"),
-                        (String) details.get("family_name"),
-                        (String) details.get("email"),
-                        (String) details.get("langKey"),
-                        (String) details.get("picture"),
-                        activated,
-                        authentication.getAuthorities().stream()
-                            .map(GrantedAuthority::getAuthority)
-                            .collect(Collectors.toSet())
-                    );
-                }
-            )
-            .orElseThrow(() -> new InternalServerErrorException("User could not be found"));
+    public UserDTO getAccount(Principal principal) {
+        if (principal != null) {
+            if (principal instanceof OAuth2Authentication) {
+                return userService.getUserFromAuthentication((OAuth2Authentication) principal);
+            } else {
+                // Allow Spring Security Test to be used to mock users in the database
+                return userService.getUserWithAuthorities()
+                    .map(UserDTO::new)
+                    .orElseThrow(() -> new InternalServerErrorException("User could not be found"));
+            }
+        } else {
+            throw new InternalServerErrorException("User could not be found");
+        }
     }
 }

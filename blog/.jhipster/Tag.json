@@ -1,14 +1,5 @@
 {
-    "fluentMethods": true,
-    "relationships": [
-        {
-            "relationshipType": "many-to-many",
-            "relationshipName": "entry",
-            "otherEntityName": "entry",
-            "ownerSide": false,
-            "otherEntityRelationshipName": "tag"
-        }
-    ],
+    "name": "Tag",
     "fields": [
         {
             "fieldName": "name",
@@ -20,11 +11,23 @@
             "fieldValidateRulesMinlength": 2
         }
     ],
-    "changelogDate": "20180212183925",
+    "relationships": [
+        {
+            "relationshipType": "many-to-many",
+            "relationshipName": "entry",
+            "otherEntityName": "entry",
+            "ownerSide": false,
+            "otherEntityRelationshipName": "tag"
+        }
+    ],
+    "changelogDate": "20180813183043",
     "entityTableName": "tag",
     "dto": "no",
-    "pagination": "no",
+    "pagination": "infinite-scroll",
     "service": "no",
     "jpaMetamodelFiltering": false,
+    "fluentMethods": true,
+    "clientRootFolder": "",
+    "applications": "*",
     "microserviceName": "blog"
 }

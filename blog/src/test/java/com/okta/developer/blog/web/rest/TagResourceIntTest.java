@@ -4,7 +4,6 @@ import com.okta.developer.blog.BlogApp;
 
 import com.okta.developer.blog.domain.Tag;
 import com.okta.developer.blog.repository.TagRepository;
-import com.okta.developer.blog.repository.search.TagSearchRepository;
 import com.okta.developer.blog.web.rest.errors.ExceptionTranslator;
 
 import org.junit.Before;
@@ -23,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import java.util.List;
+
 
 import static com.okta.developer.blog.web.rest.TestUtil.createFormattingConversionService;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -45,8 +45,6 @@ public class TagResourceIntTest {
     @Autowired
     private TagRepository tagRepository;
 
-    @Autowired
-    private TagSearchRepository tagSearchRepository;
 
     @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
@@ -67,7 +65,7 @@ public class TagResourceIntTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        final TagResource tagResource = new TagResource(tagRepository, tagSearchRepository);
+        final TagResource tagResource = new TagResource(tagRepository);
         this.restTagMockMvc = MockMvcBuilders.standaloneSetup(tagResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)
@@ -89,7 +87,6 @@ public class TagResourceIntTest {
 
     @Before
     public void initTest() {
-        tagSearchRepository.deleteAll();
         tag = createEntity(em);
     }
 
@@ -109,10 +106,6 @@ public class TagResourceIntTest {
         assertThat(tagList).hasSize(databaseSizeBeforeCreate + 1);
         Tag testTag = tagList.get(tagList.size() - 1);
         assertThat(testTag.getName()).isEqualTo(DEFAULT_NAME);
-
-        // Validate the Tag in Elasticsearch
-        Tag tagEs = tagSearchRepository.findOne(testTag.getId());
-        assertThat(tagEs).isEqualToIgnoringGivenFields(testTag);
     }
 
     @Test
@@ -165,6 +158,7 @@ public class TagResourceIntTest {
             .andExpect(jsonPath("$.[*].id").value(hasItem(tag.getId().intValue())))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())));
     }
+    
 
     @Test
     @Transactional
@@ -179,7 +173,6 @@ public class TagResourceIntTest {
             .andExpect(jsonPath("$.id").value(tag.getId().intValue()))
             .andExpect(jsonPath("$.name").value(DEFAULT_NAME.toString()));
     }
-
     @Test
     @Transactional
     public void getNonExistingTag() throws Exception {
@@ -193,11 +186,11 @@ public class TagResourceIntTest {
     public void updateTag() throws Exception {
         // Initialize the database
         tagRepository.saveAndFlush(tag);
-        tagSearchRepository.save(tag);
+
         int databaseSizeBeforeUpdate = tagRepository.findAll().size();
 
         // Update the tag
-        Tag updatedTag = tagRepository.findOne(tag.getId());
+        Tag updatedTag = tagRepository.findById(tag.getId()).get();
         // Disconnect from session so that the updates on updatedTag are not directly saved in db
         em.detach(updatedTag);
         updatedTag
@@ -213,10 +206,6 @@ public class TagResourceIntTest {
         assertThat(tagList).hasSize(databaseSizeBeforeUpdate);
         Tag testTag = tagList.get(tagList.size() - 1);
         assertThat(testTag.getName()).isEqualTo(UPDATED_NAME);
-
-        // Validate the Tag in Elasticsearch
-        Tag tagEs = tagSearchRepository.findOne(testTag.getId());
-        assertThat(tagEs).isEqualToIgnoringGivenFields(testTag);
     }
 
     @Test
@@ -230,11 +219,11 @@ public class TagResourceIntTest {
         restTagMockMvc.perform(put("/api/tags")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(tag)))
-            .andExpect(status().isCreated());
+            .andExpect(status().isBadRequest());
 
         // Validate the Tag in the database
         List<Tag> tagList = tagRepository.findAll();
-        assertThat(tagList).hasSize(databaseSizeBeforeUpdate + 1);
+        assertThat(tagList).hasSize(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -242,7 +231,7 @@ public class TagResourceIntTest {
     public void deleteTag() throws Exception {
         // Initialize the database
         tagRepository.saveAndFlush(tag);
-        tagSearchRepository.save(tag);
+
         int databaseSizeBeforeDelete = tagRepository.findAll().size();
 
         // Get the tag
@@ -250,28 +239,9 @@ public class TagResourceIntTest {
             .accept(TestUtil.APPLICATION_JSON_UTF8))
             .andExpect(status().isOk());
 
-        // Validate Elasticsearch is empty
-        boolean tagExistsInEs = tagSearchRepository.exists(tag.getId());
-        assertThat(tagExistsInEs).isFalse();
-
         // Validate the database is empty
         List<Tag> tagList = tagRepository.findAll();
         assertThat(tagList).hasSize(databaseSizeBeforeDelete - 1);
-    }
-
-    @Test
-    @Transactional
-    public void searchTag() throws Exception {
-        // Initialize the database
-        tagRepository.saveAndFlush(tag);
-        tagSearchRepository.save(tag);
-
-        // Search the tag
-        restTagMockMvc.perform(get("/api/_search/tags?query=id:" + tag.getId()))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-            .andExpect(jsonPath("$.[*].id").value(hasItem(tag.getId().intValue())))
-            .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())));
     }
 
     @Test

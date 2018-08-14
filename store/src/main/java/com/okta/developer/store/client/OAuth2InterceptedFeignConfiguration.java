@@ -7,11 +7,13 @@ import org.springframework.context.annotation.Configuration;
 
 import feign.RequestInterceptor;
 
+import com.okta.developer.store.security.oauth2.AuthorizationHeaderUtil;
+
 @Configuration
 public class OAuth2InterceptedFeignConfiguration {
 
     @Bean(name = "oauth2RequestInterceptor")
-    public RequestInterceptor getOAuth2RequestInterceptor() throws IOException {
-        return new TokenRelayRequestInterceptor();
+    public RequestInterceptor getOAuth2RequestInterceptor(AuthorizationHeaderUtil authorizationHeaderUtil) throws IOException {
+        return new TokenRelayRequestInterceptor(authorizationHeaderUtil);
     }
 }

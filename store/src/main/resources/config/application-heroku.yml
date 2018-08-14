@@ -22,11 +22,4 @@ eureka:
 spring:
     data:
         mongodb:
-            uri: ${MONGODB_URI}?authMode=scram-sha1        
-        elasticsearch:
-            cluster-name:
-            cluster-nodes:
-            properties:
-                path:
-                    logs: target/elasticsearch/log
-                    data: target/elasticsearch/data
+            uri: ${MONGODB_URI}?authMode=scram-sha1

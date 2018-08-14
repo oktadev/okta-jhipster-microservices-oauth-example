@@ -1,8 +1,7 @@
 import { browser, element, by, ExpectedConditions as ec } from 'protractor';
-import { NavBarPage, SignInPage} from './../page-objects/jhi-page-objects';
+import { NavBarPage, SignInPage } from './../page-objects/jhi-page-objects';
 
 describe('account', () => {
-
     let navBarPage: NavBarPage;
     let signInPage: SignInPage;
 
@@ -15,15 +14,19 @@ describe('account', () => {
 
     it('should fail to login with bad password', () => {
         const expect1 = /home.title/;
-        element.all(by.css('h1')).first().getAttribute('jhiTranslate').then((value) => {
-            expect(value).toMatch(expect1);
-        });
+        element
+            .all(by.css('h1'))
+            .first()
+            .getAttribute('jhiTranslate')
+            .then(value => {
+                expect(value).toMatch(expect1);
+            });
         signInPage = navBarPage.getSignInPage();
         signInPage.loginWithOAuth('admin', 'foo');
 
         // Keycloak
         const alert = element.all(by.css('.alert-error'));
-        alert.isPresent().then((result) => {
+        alert.isPresent().then(result => {
             if (result) {
                 expect(alert.first().getText()).toMatch('Invalid username or password.');
             } else {
@@ -48,7 +51,7 @@ describe('account', () => {
         const expect2 = /home.logged.message/;
         const success = element.all(by.css('.alert-success span')).first();
         browser.wait(ec.visibilityOf(success), 5000).then(() => {
-            success.getAttribute('jhiTranslate').then((value) => {
+            success.getAttribute('jhiTranslate').then(value => {
                 expect(value).toMatch(expect2);
             });
         });

@@ -2,14 +2,17 @@ package com.okta.developer.blog.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 import com.okta.developer.blog.domain.Entry;
-
 import com.okta.developer.blog.repository.EntryRepository;
-import com.okta.developer.blog.repository.search.EntrySearchRepository;
 import com.okta.developer.blog.web.rest.errors.BadRequestAlertException;
 import com.okta.developer.blog.web.rest.util.HeaderUtil;
+import com.okta.developer.blog.web.rest.util.PaginationUtil;
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,10 +22,6 @@ import java.net.URISyntaxException;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
-import static org.elasticsearch.index.query.QueryBuilders.*;
 
 /**
  * REST controller for managing Entry.
@@ -37,11 +36,8 @@ public class EntryResource {
 
     private final EntryRepository entryRepository;
 
-    private final EntrySearchRepository entrySearchRepository;
-
-    public EntryResource(EntryRepository entryRepository, EntrySearchRepository entrySearchRepository) {
+    public EntryResource(EntryRepository entryRepository) {
         this.entryRepository = entryRepository;
-        this.entrySearchRepository = entrySearchRepository;
     }
 
     /**
@@ -59,7 +55,6 @@ public class EntryResource {
             throw new BadRequestAlertException("A new entry cannot already have an ID", ENTITY_NAME, "idexists");
         }
         Entry result = entryRepository.save(entry);
-        entrySearchRepository.save(result);
         return ResponseEntity.created(new URI("/api/entries/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
             .body(result);
@@ -79,10 +74,9 @@ public class EntryResource {
     public ResponseEntity<Entry> updateEntry(@Valid @RequestBody Entry entry) throws URISyntaxException {
         log.debug("REST request to update Entry : {}", entry);
         if (entry.getId() == null) {
-            return createEntry(entry);
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
         Entry result = entryRepository.save(entry);
-        entrySearchRepository.save(result);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, entry.getId().toString()))
             .body(result);
@@ -91,14 +85,23 @@ public class EntryResource {
     /**
      * GET  /entries : get all the entries.
      *
+     * @param pageable the pagination information
+     * @param eagerload flag to eager load entities from relationships (This is applicable for many-to-many)
      * @return the ResponseEntity with status 200 (OK) and the list of entries in body
      */
     @GetMapping("/entries")
     @Timed
-    public List<Entry> getAllEntries() {
-        log.debug("REST request to get all Entries");
-        return entryRepository.findAllWithEagerRelationships();
+    public ResponseEntity<List<Entry>> getAllEntries(Pageable pageable, @RequestParam(required = false, defaultValue = "false") boolean eagerload) {
+        log.debug("REST request to get a page of Entries");
+        Page<Entry> page;
+        if (eagerload) {
+            page = entryRepository.findAllWithEagerRelationships(pageable);
+        } else {
+            page = entryRepository.findAll(pageable);
         }
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, String.format("/api/entries?eagerload=%b", eagerload));
+        return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
+    }
 
     /**
      * GET  /entries/:id : get the "id" entry.
@@ -110,8 +113,8 @@ public class EntryResource {
     @Timed
     public ResponseEntity<Entry> getEntry(@PathVariable Long id) {
         log.debug("REST request to get Entry : {}", id);
-        Entry entry = entryRepository.findOneWithEagerRelationships(id);
-        return ResponseUtil.wrapOrNotFound(Optional.ofNullable(entry));
+        Optional<Entry> entry = entryRepository.findOneWithEagerRelationships(id);
+        return ResponseUtil.wrapOrNotFound(entry);
     }
 
     /**
@@ -124,25 +127,8 @@ public class EntryResource {
     @Timed
     public ResponseEntity<Void> deleteEntry(@PathVariable Long id) {
         log.debug("REST request to delete Entry : {}", id);
-        entryRepository.delete(id);
-        entrySearchRepository.delete(id);
+
+        entryRepository.deleteById(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
-
-    /**
-     * SEARCH  /_search/entries?query=:query : search for the entry corresponding
-     * to the query.
-     *
-     * @param query the query of the entry search
-     * @return the result of the search
-     */
-    @GetMapping("/_search/entries")
-    @Timed
-    public List<Entry> searchEntries(@RequestParam String query) {
-        log.debug("REST request to search Entries for query {}", query);
-        return StreamSupport
-            .stream(entrySearchRepository.search(queryStringQuery(query)).spliterator(), false)
-            .collect(Collectors.toList());
-    }
-
 }
