@@ -5,7 +5,6 @@ import com.okta.developer.blog.BlogApp;
 import com.okta.developer.blog.domain.Blog;
 import com.okta.developer.blog.repository.UserRepository;
 import com.okta.developer.blog.repository.BlogRepository;
-import com.okta.developer.blog.repository.search.BlogSearchRepository;
 import com.okta.developer.blog.web.rest.errors.ExceptionTranslator;
 
 import org.junit.Before;
@@ -23,15 +22,12 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
-import java.util.Collections;
 import java.util.List;
 
 
 import static com.okta.developer.blog.web.rest.TestUtil.createFormattingConversionService;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
 import static org.hamcrest.Matchers.hasItem;
-import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -57,14 +53,6 @@ public class BlogResourceIntTest {
     private UserRepository userRepository;
 
 
-    /**
-     * This repository is mocked in the com.okta.developer.blog.repository.search test package.
-     *
-     * @see com.okta.developer.blog.repository.search.BlogSearchRepositoryMockConfiguration
-     */
-    @Autowired
-    private BlogSearchRepository mockBlogSearchRepository;
-
     @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
@@ -84,7 +72,7 @@ public class BlogResourceIntTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        final BlogResource blogResource = new BlogResource(blogRepository, userRepository, mockBlogSearchRepository);
+        final BlogResource blogResource = new BlogResource(blogRepository, userRepository);
         this.restBlogMockMvc = MockMvcBuilders.standaloneSetup(blogResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)
@@ -127,9 +115,6 @@ public class BlogResourceIntTest {
         Blog testBlog = blogList.get(blogList.size() - 1);
         assertThat(testBlog.getName()).isEqualTo(DEFAULT_NAME);
         assertThat(testBlog.getHandle()).isEqualTo(DEFAULT_HANDLE);
-
-        // Validate the Blog in Elasticsearch
-        verify(mockBlogSearchRepository, times(1)).save(testBlog);
     }
 
     @Test
@@ -149,9 +134,6 @@ public class BlogResourceIntTest {
         // Validate the Blog in the database
         List<Blog> blogList = blogRepository.findAll();
         assertThat(blogList).hasSize(databaseSizeBeforeCreate);
-
-        // Validate the Blog in Elasticsearch
-        verify(mockBlogSearchRepository, times(0)).save(blog);
     }
 
     @Test
@@ -255,9 +237,6 @@ public class BlogResourceIntTest {
         Blog testBlog = blogList.get(blogList.size() - 1);
         assertThat(testBlog.getName()).isEqualTo(UPDATED_NAME);
         assertThat(testBlog.getHandle()).isEqualTo(UPDATED_HANDLE);
-
-        // Validate the Blog in Elasticsearch
-        verify(mockBlogSearchRepository, times(1)).save(testBlog);
     }
 
     @Test
@@ -276,9 +255,6 @@ public class BlogResourceIntTest {
         // Validate the Blog in the database
         List<Blog> blogList = blogRepository.findAll();
         assertThat(blogList).hasSize(databaseSizeBeforeUpdate);
-
-        // Validate the Blog in Elasticsearch
-        verify(mockBlogSearchRepository, times(0)).save(blog);
     }
 
     @Test
@@ -297,25 +273,6 @@ public class BlogResourceIntTest {
         // Validate the database is empty
         List<Blog> blogList = blogRepository.findAll();
         assertThat(blogList).hasSize(databaseSizeBeforeDelete - 1);
-
-        // Validate the Blog in Elasticsearch
-        verify(mockBlogSearchRepository, times(1)).deleteById(blog.getId());
-    }
-
-    @Test
-    @Transactional
-    public void searchBlog() throws Exception {
-        // Initialize the database
-        blogRepository.saveAndFlush(blog);
-        when(mockBlogSearchRepository.search(queryStringQuery("id:" + blog.getId())))
-            .thenReturn(Collections.singletonList(blog));
-        // Search the blog
-        restBlogMockMvc.perform(get("/api/_search/blogs?query=id:" + blog.getId()))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-            .andExpect(jsonPath("$.[*].id").value(hasItem(blog.getId().intValue())))
-            .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())))
-            .andExpect(jsonPath("$.[*].handle").value(hasItem(DEFAULT_HANDLE.toString())));
     }
 
     @Test

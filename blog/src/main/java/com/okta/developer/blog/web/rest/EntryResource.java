@@ -3,7 +3,6 @@ package com.okta.developer.blog.web.rest;
 import com.codahale.metrics.annotation.Timed;
 import com.okta.developer.blog.domain.Entry;
 import com.okta.developer.blog.repository.EntryRepository;
-import com.okta.developer.blog.repository.search.EntrySearchRepository;
 import com.okta.developer.blog.web.rest.errors.BadRequestAlertException;
 import com.okta.developer.blog.web.rest.util.HeaderUtil;
 import com.okta.developer.blog.web.rest.util.PaginationUtil;
@@ -23,10 +22,6 @@ import java.net.URISyntaxException;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
-import static org.elasticsearch.index.query.QueryBuilders.*;
 
 /**
  * REST controller for managing Entry.
@@ -41,11 +36,8 @@ public class EntryResource {
 
     private final EntryRepository entryRepository;
 
-    private final EntrySearchRepository entrySearchRepository;
-
-    public EntryResource(EntryRepository entryRepository, EntrySearchRepository entrySearchRepository) {
+    public EntryResource(EntryRepository entryRepository) {
         this.entryRepository = entryRepository;
-        this.entrySearchRepository = entrySearchRepository;
     }
 
     /**
@@ -63,7 +55,6 @@ public class EntryResource {
             throw new BadRequestAlertException("A new entry cannot already have an ID", ENTITY_NAME, "idexists");
         }
         Entry result = entryRepository.save(entry);
-        entrySearchRepository.save(result);
         return ResponseEntity.created(new URI("/api/entries/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
             .body(result);
@@ -86,7 +77,6 @@ public class EntryResource {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
         Entry result = entryRepository.save(entry);
-        entrySearchRepository.save(result);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, entry.getId().toString()))
             .body(result);
@@ -139,25 +129,6 @@ public class EntryResource {
         log.debug("REST request to delete Entry : {}", id);
 
         entryRepository.deleteById(id);
-        entrySearchRepository.deleteById(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
-
-    /**
-     * SEARCH  /_search/entries?query=:query : search for the entry corresponding
-     * to the query.
-     *
-     * @param query the query of the entry search
-     * @param pageable the pagination information
-     * @return the result of the search
-     */
-    @GetMapping("/_search/entries")
-    @Timed
-    public ResponseEntity<List<Entry>> searchEntries(@RequestParam String query, Pageable pageable) {
-        log.debug("REST request to search for a page of Entries for query {}", query);
-        Page<Entry> page = entrySearchRepository.search(queryStringQuery(query), pageable);
-        HttpHeaders headers = PaginationUtil.generateSearchPaginationHttpHeaders(query, page, "/api/_search/entries");
-        return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
-    }
-
 }

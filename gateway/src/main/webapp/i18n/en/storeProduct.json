@@ -5,8 +5,7 @@
             "home": {
                 "title": "Products",
                 "createLabel": "Create a new Product",
-                "createOrEditLabel": "Create or edit a Product",
-                "search": "Search for Product"
+                "createOrEditLabel": "Create or edit a Product"
             },
             "delete": {
                 "question": "Are you sure you want to delete Product {{ id }}?"

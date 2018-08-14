@@ -50,10 +50,6 @@ spring:
             hibernate.cache.hazelcast.instance_name: blog
             hibernate.cache.use_minimal_puts: true
             hibernate.cache.hazelcast.use_lite_member: true
-    data:
-        elasticsearch:
-            cluster-name:
-            cluster-nodes: localhost:9300
     liquibase:
         contexts: prod
     mail:

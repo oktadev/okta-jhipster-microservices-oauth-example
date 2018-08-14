@@ -36,9 +36,6 @@ spring:
         mongodb:
             uri: mongodb://localhost:27017
             database: store
-        elasticsearch:
-            cluster-name:
-            cluster-nodes: localhost:9300
     mail:
         host: localhost
         port: 25

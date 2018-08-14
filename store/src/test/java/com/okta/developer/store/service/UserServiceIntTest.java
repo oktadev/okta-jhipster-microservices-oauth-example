@@ -3,7 +3,6 @@ package com.okta.developer.store.service;
 import com.okta.developer.store.StoreApp;
 import com.okta.developer.store.config.Constants;
 import com.okta.developer.store.domain.User;
-import com.okta.developer.store.repository.search.UserSearchRepository;
 import com.okta.developer.store.repository.UserRepository;
 import com.okta.developer.store.service.dto.UserDTO;
 
@@ -18,8 +17,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 /**
  * Test class for the UserResource REST controller.
@@ -35,14 +32,6 @@ public class UserServiceIntTest {
 
     @Autowired
     private UserService userService;
-
-    /**
-     * This repository is mocked in the com.okta.developer.store.repository.search test package.
-     *
-     * @see com.okta.developer.store.repository.search.UserSearchRepositoryMockConfiguration
-     */
-    @Autowired
-    private UserSearchRepository mockUserSearchRepository;
 
     private User user;
 

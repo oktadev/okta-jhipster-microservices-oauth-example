@@ -4,7 +4,6 @@ import com.okta.developer.store.StoreApp;
 
 import com.okta.developer.store.domain.Product;
 import com.okta.developer.store.repository.ProductRepository;
-import com.okta.developer.store.repository.search.ProductSearchRepository;
 import com.okta.developer.store.web.rest.errors.ExceptionTranslator;
 
 import org.junit.Before;
@@ -13,8 +12,6 @@ import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -23,15 +20,12 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.util.Base64Utils;
 
-import java.util.Collections;
 import java.util.List;
 
 
 import static com.okta.developer.store.web.rest.TestUtil.createFormattingConversionService;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
 import static org.hamcrest.Matchers.hasItem;
-import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -59,14 +53,6 @@ public class ProductResourceIntTest {
     private ProductRepository productRepository;
 
 
-    /**
-     * This repository is mocked in the com.okta.developer.store.repository.search test package.
-     *
-     * @see com.okta.developer.store.repository.search.ProductSearchRepositoryMockConfiguration
-     */
-    @Autowired
-    private ProductSearchRepository mockProductSearchRepository;
-
     @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
@@ -83,7 +69,7 @@ public class ProductResourceIntTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        final ProductResource productResource = new ProductResource(productRepository, mockProductSearchRepository);
+        final ProductResource productResource = new ProductResource(productRepository);
         this.restProductMockMvc = MockMvcBuilders.standaloneSetup(productResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)
@@ -130,9 +116,6 @@ public class ProductResourceIntTest {
         assertThat(testProduct.getPrice()).isEqualTo(DEFAULT_PRICE);
         assertThat(testProduct.getImage()).isEqualTo(DEFAULT_IMAGE);
         assertThat(testProduct.getImageContentType()).isEqualTo(DEFAULT_IMAGE_CONTENT_TYPE);
-
-        // Validate the Product in Elasticsearch
-        verify(mockProductSearchRepository, times(1)).save(testProduct);
     }
 
     @Test
@@ -151,9 +134,6 @@ public class ProductResourceIntTest {
         // Validate the Product in the database
         List<Product> productList = productRepository.findAll();
         assertThat(productList).hasSize(databaseSizeBeforeCreate);
-
-        // Validate the Product in Elasticsearch
-        verify(mockProductSearchRepository, times(0)).save(product);
     }
 
     @Test
@@ -257,9 +237,6 @@ public class ProductResourceIntTest {
         assertThat(testProduct.getPrice()).isEqualTo(UPDATED_PRICE);
         assertThat(testProduct.getImage()).isEqualTo(UPDATED_IMAGE);
         assertThat(testProduct.getImageContentType()).isEqualTo(UPDATED_IMAGE_CONTENT_TYPE);
-
-        // Validate the Product in Elasticsearch
-        verify(mockProductSearchRepository, times(1)).save(testProduct);
     }
 
     @Test
@@ -277,9 +254,6 @@ public class ProductResourceIntTest {
         // Validate the Product in the database
         List<Product> productList = productRepository.findAll();
         assertThat(productList).hasSize(databaseSizeBeforeUpdate);
-
-        // Validate the Product in Elasticsearch
-        verify(mockProductSearchRepository, times(0)).save(product);
     }
 
     @Test
@@ -297,26 +271,6 @@ public class ProductResourceIntTest {
         // Validate the database is empty
         List<Product> productList = productRepository.findAll();
         assertThat(productList).hasSize(databaseSizeBeforeDelete - 1);
-
-        // Validate the Product in Elasticsearch
-        verify(mockProductSearchRepository, times(1)).deleteById(product.getId());
-    }
-
-    @Test
-    public void searchProduct() throws Exception {
-        // Initialize the database
-        productRepository.save(product);
-        when(mockProductSearchRepository.search(queryStringQuery("id:" + product.getId()), PageRequest.of(0, 20)))
-            .thenReturn(new PageImpl<>(Collections.singletonList(product), PageRequest.of(0, 1), 1));
-        // Search the product
-        restProductMockMvc.perform(get("/api/_search/products?query=id:" + product.getId()))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-            .andExpect(jsonPath("$.[*].id").value(hasItem(product.getId())))
-            .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())))
-            .andExpect(jsonPath("$.[*].price").value(hasItem(DEFAULT_PRICE.doubleValue())))
-            .andExpect(jsonPath("$.[*].imageContentType").value(hasItem(DEFAULT_IMAGE_CONTENT_TYPE)))
-            .andExpect(jsonPath("$.[*].image").value(hasItem(Base64Utils.encodeToString(DEFAULT_IMAGE))));
     }
 
     @Test

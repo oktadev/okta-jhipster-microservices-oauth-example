@@ -4,7 +4,6 @@ import com.okta.developer.blog.BlogApp;
 
 import com.okta.developer.blog.domain.Entry;
 import com.okta.developer.blog.repository.EntryRepository;
-import com.okta.developer.blog.repository.search.EntrySearchRepository;
 import com.okta.developer.blog.web.rest.errors.ExceptionTranslator;
 
 import org.junit.Before;
@@ -29,13 +28,11 @@ import javax.persistence.EntityManager;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 
 import static com.okta.developer.blog.web.rest.TestUtil.createFormattingConversionService;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
 import static org.hamcrest.Matchers.hasItem;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -64,14 +61,6 @@ public class EntryResourceIntTest {
     @Mock
     private EntryRepository entryRepositoryMock;
 
-    /**
-     * This repository is mocked in the com.okta.developer.blog.repository.search test package.
-     *
-     * @see com.okta.developer.blog.repository.search.EntrySearchRepositoryMockConfiguration
-     */
-    @Autowired
-    private EntrySearchRepository mockEntrySearchRepository;
-
     @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
@@ -91,7 +80,7 @@ public class EntryResourceIntTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        final EntryResource entryResource = new EntryResource(entryRepository, mockEntrySearchRepository);
+        final EntryResource entryResource = new EntryResource(entryRepository);
         this.restEntryMockMvc = MockMvcBuilders.standaloneSetup(entryResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)
@@ -136,9 +125,6 @@ public class EntryResourceIntTest {
         assertThat(testEntry.getTitle()).isEqualTo(DEFAULT_TITLE);
         assertThat(testEntry.getContent()).isEqualTo(DEFAULT_CONTENT);
         assertThat(testEntry.getDate()).isEqualTo(DEFAULT_DATE);
-
-        // Validate the Entry in Elasticsearch
-        verify(mockEntrySearchRepository, times(1)).save(testEntry);
     }
 
     @Test
@@ -158,9 +144,6 @@ public class EntryResourceIntTest {
         // Validate the Entry in the database
         List<Entry> entryList = entryRepository.findAll();
         assertThat(entryList).hasSize(databaseSizeBeforeCreate);
-
-        // Validate the Entry in Elasticsearch
-        verify(mockEntrySearchRepository, times(0)).save(entry);
     }
 
     @Test
@@ -216,7 +199,7 @@ public class EntryResourceIntTest {
     }
     
     public void getAllEntriesWithEagerRelationshipsIsEnabled() throws Exception {
-        EntryResource entryResource = new EntryResource(entryRepositoryMock, mockEntrySearchRepository);
+        EntryResource entryResource = new EntryResource(entryRepositoryMock);
         when(entryRepositoryMock.findAllWithEagerRelationships(any())).thenReturn(new PageImpl(new ArrayList<>()));
 
         MockMvc restEntryMockMvc = MockMvcBuilders.standaloneSetup(entryResource)
@@ -232,7 +215,7 @@ public class EntryResourceIntTest {
     }
 
     public void getAllEntriesWithEagerRelationshipsIsNotEnabled() throws Exception {
-        EntryResource entryResource = new EntryResource(entryRepositoryMock, mockEntrySearchRepository);
+        EntryResource entryResource = new EntryResource(entryRepositoryMock);
             when(entryRepositoryMock.findAllWithEagerRelationships(any())).thenReturn(new PageImpl(new ArrayList<>()));
             MockMvc restEntryMockMvc = MockMvcBuilders.standaloneSetup(entryResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
@@ -298,9 +281,6 @@ public class EntryResourceIntTest {
         assertThat(testEntry.getTitle()).isEqualTo(UPDATED_TITLE);
         assertThat(testEntry.getContent()).isEqualTo(UPDATED_CONTENT);
         assertThat(testEntry.getDate()).isEqualTo(UPDATED_DATE);
-
-        // Validate the Entry in Elasticsearch
-        verify(mockEntrySearchRepository, times(1)).save(testEntry);
     }
 
     @Test
@@ -319,9 +299,6 @@ public class EntryResourceIntTest {
         // Validate the Entry in the database
         List<Entry> entryList = entryRepository.findAll();
         assertThat(entryList).hasSize(databaseSizeBeforeUpdate);
-
-        // Validate the Entry in Elasticsearch
-        verify(mockEntrySearchRepository, times(0)).save(entry);
     }
 
     @Test
@@ -340,26 +317,6 @@ public class EntryResourceIntTest {
         // Validate the database is empty
         List<Entry> entryList = entryRepository.findAll();
         assertThat(entryList).hasSize(databaseSizeBeforeDelete - 1);
-
-        // Validate the Entry in Elasticsearch
-        verify(mockEntrySearchRepository, times(1)).deleteById(entry.getId());
-    }
-
-    @Test
-    @Transactional
-    public void searchEntry() throws Exception {
-        // Initialize the database
-        entryRepository.saveAndFlush(entry);
-        when(mockEntrySearchRepository.search(queryStringQuery("id:" + entry.getId()), PageRequest.of(0, 20)))
-            .thenReturn(new PageImpl<>(Collections.singletonList(entry), PageRequest.of(0, 1), 1));
-        // Search the entry
-        restEntryMockMvc.perform(get("/api/_search/entries?query=id:" + entry.getId()))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-            .andExpect(jsonPath("$.[*].id").value(hasItem(entry.getId().intValue())))
-            .andExpect(jsonPath("$.[*].title").value(hasItem(DEFAULT_TITLE.toString())))
-            .andExpect(jsonPath("$.[*].content").value(hasItem(DEFAULT_CONTENT.toString())))
-            .andExpect(jsonPath("$.[*].date").value(hasItem(DEFAULT_DATE.toString())));
     }
 
     @Test

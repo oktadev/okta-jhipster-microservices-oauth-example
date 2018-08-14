@@ -4,7 +4,6 @@ import com.okta.developer.store.StoreApp;
 import com.okta.developer.store.domain.Authority;
 import com.okta.developer.store.domain.User;
 import com.okta.developer.store.repository.UserRepository;
-import com.okta.developer.store.repository.search.UserSearchRepository;
 import com.okta.developer.store.security.AuthoritiesConstants;
 
 import com.okta.developer.store.service.UserService;
@@ -63,14 +62,6 @@ public class UserResourceIntTest {
     @Autowired
     private UserRepository userRepository;
 
-    /**
-     * This repository is mocked in the com.okta.developer.store.repository.search test package.
-     *
-     * @see com.okta.developer.store.repository.search.UserSearchRepositoryMockConfiguration
-     */
-    @Autowired
-    private UserSearchRepository mockUserSearchRepository;
-
     @Autowired
     private UserService userService;
 
@@ -98,7 +89,7 @@ public class UserResourceIntTest {
         MockitoAnnotations.initMocks(this);
         cacheManager.getCache(UserRepository.USERS_BY_LOGIN_CACHE).clear();
         cacheManager.getCache(UserRepository.USERS_BY_EMAIL_CACHE).clear();
-        UserResource userResource = new UserResource(userService, mockUserSearchRepository);
+        UserResource userResource = new UserResource(userService);
         this.restUserMockMvc = MockMvcBuilders.standaloneSetup(userResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)
@@ -135,7 +126,6 @@ public class UserResourceIntTest {
     public void getAllUsers() throws Exception {
         // Initialize the database
         userRepository.save(user);
-        mockUserSearchRepository.save(user);
 
         // Get all the users
         restUserMockMvc.perform(get("/api/users")
@@ -154,7 +144,6 @@ public class UserResourceIntTest {
     public void getUser() throws Exception {
         // Initialize the database
         userRepository.save(user);
-        mockUserSearchRepository.save(user);
 
         assertThat(cacheManager.getCache(UserRepository.USERS_BY_LOGIN_CACHE).get(user.getLogin())).isNull();
 
