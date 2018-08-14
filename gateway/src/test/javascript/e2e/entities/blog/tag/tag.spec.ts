@@ -1,42 +1,44 @@
-import { browser } from 'protractor';
-import { NavBarPage } from './../../../page-objects/jhi-page-objects';
+import { browser, ExpectedConditions as ec } from 'protractor';
+import { NavBarPage, SignInPage } from '../../../page-objects/jhi-page-objects';
+
 import { TagComponentsPage, TagUpdatePage } from './tag.page-object';
 
 describe('Tag e2e test', () => {
     let navBarPage: NavBarPage;
+    let signInPage: SignInPage;
     let tagUpdatePage: TagUpdatePage;
     let tagComponentsPage: TagComponentsPage;
 
-    beforeAll(() => {
-        browser.get('/');
-        browser.waitForAngular();
+    beforeAll(async () => {
+        await browser.get('/');
         navBarPage = new NavBarPage();
-        navBarPage.getSignInPage().loginWithOAuth('admin', 'admin');
-        browser.waitForAngular();
+        signInPage = await navBarPage.getSignInPage();
+        await signInPage.loginWithOAuth('admin', 'admin');
+        await browser.wait(ec.visibilityOf(navBarPage.entityMenu), 5000);
     });
 
-    it('should load Tags', () => {
-        navBarPage.goToEntity('tag');
+    it('should load Tags', async () => {
+        await navBarPage.goToEntity('tag');
         tagComponentsPage = new TagComponentsPage();
-        expect(tagComponentsPage.getTitle()).toMatch(/gatewayApp.blogTag.home.title/);
+        expect(await tagComponentsPage.getTitle()).toMatch(/gatewayApp.blogTag.home.title/);
     });
 
-    it('should load create Tag page', () => {
-        tagComponentsPage.clickOnCreateButton();
+    it('should load create Tag page', async () => {
+        await tagComponentsPage.clickOnCreateButton();
         tagUpdatePage = new TagUpdatePage();
-        expect(tagUpdatePage.getPageTitle()).toMatch(/gatewayApp.blogTag.home.createOrEditLabel/);
-        tagUpdatePage.cancel();
+        expect(await tagUpdatePage.getPageTitle()).toMatch(/gatewayApp.blogTag.home.createOrEditLabel/);
+        await tagUpdatePage.cancel();
     });
 
-    it('should create and save Tags', () => {
-        tagComponentsPage.clickOnCreateButton();
-        tagUpdatePage.setNameInput('name');
-        expect(tagUpdatePage.getNameInput()).toMatch('name');
-        tagUpdatePage.save();
-        expect(tagUpdatePage.getSaveButton().isPresent()).toBeFalsy();
+    it('should create and save Tags', async () => {
+        await tagComponentsPage.clickOnCreateButton();
+        await tagUpdatePage.setNameInput('name');
+        expect(await tagUpdatePage.getNameInput()).toMatch('name');
+        await tagUpdatePage.save();
+        expect(await tagUpdatePage.getSaveButton().isPresent()).toBeFalsy();
     });
 
-    afterAll(() => {
-        navBarPage.autoSignOut();
+    afterAll(async () => {
+        await navBarPage.autoSignOut();
     });
 });

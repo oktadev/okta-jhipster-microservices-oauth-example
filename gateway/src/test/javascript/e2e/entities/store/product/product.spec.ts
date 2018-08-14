@@ -1,48 +1,50 @@
-import { browser } from 'protractor';
-import { NavBarPage } from './../../../page-objects/jhi-page-objects';
+import { browser, ExpectedConditions as ec } from 'protractor';
+import { NavBarPage, SignInPage } from '../../../page-objects/jhi-page-objects';
+
 import { ProductComponentsPage, ProductUpdatePage } from './product.page-object';
 import * as path from 'path';
 
 describe('Product e2e test', () => {
     let navBarPage: NavBarPage;
+    let signInPage: SignInPage;
     let productUpdatePage: ProductUpdatePage;
     let productComponentsPage: ProductComponentsPage;
     const fileToUpload = '../../../../../../main/webapp/content/images/logo-jhipster.png';
     const absolutePath = path.resolve(__dirname, fileToUpload);
 
-    beforeAll(() => {
-        browser.get('/');
-        browser.waitForAngular();
+    beforeAll(async () => {
+        await browser.get('/');
         navBarPage = new NavBarPage();
-        navBarPage.getSignInPage().loginWithOAuth('admin', 'admin');
-        browser.waitForAngular();
+        signInPage = await navBarPage.getSignInPage();
+        await signInPage.loginWithOAuth('admin', 'admin');
+        await browser.wait(ec.visibilityOf(navBarPage.entityMenu), 5000);
     });
 
-    it('should load Products', () => {
-        navBarPage.goToEntity('product');
+    it('should load Products', async () => {
+        await navBarPage.goToEntity('product');
         productComponentsPage = new ProductComponentsPage();
-        expect(productComponentsPage.getTitle()).toMatch(/gatewayApp.storeProduct.home.title/);
+        expect(await productComponentsPage.getTitle()).toMatch(/gatewayApp.storeProduct.home.title/);
     });
 
-    it('should load create Product page', () => {
-        productComponentsPage.clickOnCreateButton();
+    it('should load create Product page', async () => {
+        await productComponentsPage.clickOnCreateButton();
         productUpdatePage = new ProductUpdatePage();
-        expect(productUpdatePage.getPageTitle()).toMatch(/gatewayApp.storeProduct.home.createOrEditLabel/);
-        productUpdatePage.cancel();
+        expect(await productUpdatePage.getPageTitle()).toMatch(/gatewayApp.storeProduct.home.createOrEditLabel/);
+        await productUpdatePage.cancel();
     });
 
-    it('should create and save Products', () => {
-        productComponentsPage.clickOnCreateButton();
-        productUpdatePage.setNameInput('name');
-        expect(productUpdatePage.getNameInput()).toMatch('name');
-        productUpdatePage.setPriceInput('5');
-        expect(productUpdatePage.getPriceInput()).toMatch('5');
-        productUpdatePage.setImageInput(absolutePath);
-        productUpdatePage.save();
-        expect(productUpdatePage.getSaveButton().isPresent()).toBeFalsy();
+    it('should create and save Products', async () => {
+        await productComponentsPage.clickOnCreateButton();
+        await productUpdatePage.setNameInput('name');
+        expect(await productUpdatePage.getNameInput()).toMatch('name');
+        await productUpdatePage.setPriceInput('5');
+        expect(await productUpdatePage.getPriceInput()).toMatch('5');
+        await productUpdatePage.setImageInput(absolutePath);
+        await productUpdatePage.save();
+        expect(await productUpdatePage.getSaveButton().isPresent()).toBeFalsy();
     });
 
-    afterAll(() => {
-        navBarPage.autoSignOut();
+    afterAll(async () => {
+        await navBarPage.autoSignOut();
     });
 });

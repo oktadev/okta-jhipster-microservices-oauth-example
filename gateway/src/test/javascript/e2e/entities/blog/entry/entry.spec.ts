@@ -1,48 +1,50 @@
-import { browser, protractor } from 'protractor';
-import { NavBarPage } from './../../../page-objects/jhi-page-objects';
+import { browser, ExpectedConditions as ec, protractor } from 'protractor';
+import { NavBarPage, SignInPage } from '../../../page-objects/jhi-page-objects';
+
 import { EntryComponentsPage, EntryUpdatePage } from './entry.page-object';
 
 describe('Entry e2e test', () => {
     let navBarPage: NavBarPage;
+    let signInPage: SignInPage;
     let entryUpdatePage: EntryUpdatePage;
     let entryComponentsPage: EntryComponentsPage;
 
-    beforeAll(() => {
-        browser.get('/');
-        browser.waitForAngular();
+    beforeAll(async () => {
+        await browser.get('/');
         navBarPage = new NavBarPage();
-        navBarPage.getSignInPage().loginWithOAuth('admin', 'admin');
-        browser.waitForAngular();
+        signInPage = await navBarPage.getSignInPage();
+        await signInPage.loginWithOAuth('admin', 'admin');
+        await browser.wait(ec.visibilityOf(navBarPage.entityMenu), 5000);
     });
 
-    it('should load Entries', () => {
-        navBarPage.goToEntity('entry');
+    it('should load Entries', async () => {
+        await navBarPage.goToEntity('entry');
         entryComponentsPage = new EntryComponentsPage();
-        expect(entryComponentsPage.getTitle()).toMatch(/gatewayApp.blogEntry.home.title/);
+        expect(await entryComponentsPage.getTitle()).toMatch(/gatewayApp.blogEntry.home.title/);
     });
 
-    it('should load create Entry page', () => {
-        entryComponentsPage.clickOnCreateButton();
+    it('should load create Entry page', async () => {
+        await entryComponentsPage.clickOnCreateButton();
         entryUpdatePage = new EntryUpdatePage();
-        expect(entryUpdatePage.getPageTitle()).toMatch(/gatewayApp.blogEntry.home.createOrEditLabel/);
-        entryUpdatePage.cancel();
+        expect(await entryUpdatePage.getPageTitle()).toMatch(/gatewayApp.blogEntry.home.createOrEditLabel/);
+        await entryUpdatePage.cancel();
     });
 
-    it('should create and save Entries', () => {
-        entryComponentsPage.clickOnCreateButton();
-        entryUpdatePage.setTitleInput('title');
-        expect(entryUpdatePage.getTitleInput()).toMatch('title');
-        entryUpdatePage.setContentInput('content');
-        expect(entryUpdatePage.getContentInput()).toMatch('content');
-        entryUpdatePage.setDateInput('01/01/2001' + protractor.Key.TAB + '02:30AM');
-        expect(entryUpdatePage.getDateInput()).toContain('2001-01-01T02:30');
-        entryUpdatePage.blogSelectLastOption();
+    it('should create and save Entries', async () => {
+        await entryComponentsPage.clickOnCreateButton();
+        await entryUpdatePage.setTitleInput('title');
+        expect(await entryUpdatePage.getTitleInput()).toMatch('title');
+        await entryUpdatePage.setContentInput('content');
+        expect(await entryUpdatePage.getContentInput()).toMatch('content');
+        await entryUpdatePage.setDateInput('01/01/2001' + protractor.Key.TAB + '02:30AM');
+        expect(await entryUpdatePage.getDateInput()).toContain('2001-01-01T02:30');
+        await entryUpdatePage.blogSelectLastOption();
         // entryUpdatePage.tagSelectLastOption();
-        entryUpdatePage.save();
-        expect(entryUpdatePage.getSaveButton().isPresent()).toBeFalsy();
+        await entryUpdatePage.save();
+        expect(await entryUpdatePage.getSaveButton().isPresent()).toBeFalsy();
     });
 
-    afterAll(() => {
-        navBarPage.autoSignOut();
+    afterAll(async () => {
+        await navBarPage.autoSignOut();
     });
 });
