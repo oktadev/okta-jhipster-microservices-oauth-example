@@ -13,7 +13,7 @@
       "zipkin"
     ],
     "serviceDiscoveryType": "eureka",
-    "adminPassword": "12regist34",
+    "adminPassword": "admin",
     "jwtSecretKey": "7f6054d684e5b4655f53589dd2157d46f40d8fcf"
   }
 }
