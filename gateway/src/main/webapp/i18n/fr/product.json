@@ -1,0 +1,25 @@
+
+{
+    "gatewayApp": {
+        "product" : {
+            "home": {
+                "title": "Products",
+                "createLabel": "Créer un nouveau Product",
+                "createOrEditLabel": "Créer ou éditer un Product",
+                "search": "Recherche pour Product"
+            },
+            "created": "Un nouveau Product a été créé avec l'identifiant {{ param }}",
+            "updated": "Le Product avec l'identifiant {{ param }} a été mis à jour",
+            "deleted": "Le Product avec l'identifiant {{ param }} a été supprimé",
+            "delete": {
+                "question": "Etes-vous certain de vouloir supprimer le Product {{ id }} ?"
+            },
+            "detail": {
+                "title": "Product"
+            },
+            "title": "Title",
+            "price": "Price",
+            "image": "Image"
+        }
+    }
+}

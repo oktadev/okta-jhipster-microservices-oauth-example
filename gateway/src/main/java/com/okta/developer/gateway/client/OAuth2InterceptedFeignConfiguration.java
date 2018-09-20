@@ -3,13 +3,11 @@ package com.okta.developer.gateway.client;
 import java.io.IOException;
 
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 import feign.RequestInterceptor;
 
 import com.okta.developer.gateway.security.oauth2.AuthorizationHeaderUtil;
 
-@Configuration
 public class OAuth2InterceptedFeignConfiguration {
 
     @Bean(name = "oauth2RequestInterceptor")

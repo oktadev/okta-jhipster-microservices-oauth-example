@@ -1,10 +1,11 @@
 package com.okta.developer.store.service;
 
+import com.okta.developer.store.config.Constants;
 import com.okta.developer.store.domain.Authority;
 import com.okta.developer.store.domain.User;
 import com.okta.developer.store.repository.AuthorityRepository;
-import com.okta.developer.store.config.Constants;
 import com.okta.developer.store.repository.UserRepository;
+import com.okta.developer.store.repository.search.UserSearchRepository;
 import com.okta.developer.store.security.SecurityUtils;
 import com.okta.developer.store.service.dto.UserDTO;
 
@@ -36,12 +37,15 @@ public class UserService {
 
     private final UserRepository userRepository;
 
+    private final UserSearchRepository userSearchRepository;
+
     private final AuthorityRepository authorityRepository;
 
     private final CacheManager cacheManager;
 
-    public UserService(UserRepository userRepository, AuthorityRepository authorityRepository, CacheManager cacheManager) {
+    public UserService(UserRepository userRepository, UserSearchRepository userSearchRepository, AuthorityRepository authorityRepository, CacheManager cacheManager) {
         this.userRepository = userRepository;
+        this.userSearchRepository = userSearchRepository;
         this.authorityRepository = authorityRepository;
         this.cacheManager = cacheManager;
     }
@@ -61,10 +65,11 @@ public class UserService {
             .ifPresent(user -> {
                 user.setFirstName(firstName);
                 user.setLastName(lastName);
-                user.setEmail(email);
+                user.setEmail(email.toLowerCase());
                 user.setLangKey(langKey);
                 user.setImageUrl(imageUrl);
                 userRepository.save(user);
+                userSearchRepository.save(user);
                 this.clearUserCaches(user);
                 log.debug("Changed Information for User: {}", user);
             });
@@ -83,10 +88,10 @@ public class UserService {
             .map(Optional::get)
             .map(user -> {
                 this.clearUserCaches(user);
-                user.setLogin(userDTO.getLogin());
+                user.setLogin(userDTO.getLogin().toLowerCase());
                 user.setFirstName(userDTO.getFirstName());
                 user.setLastName(userDTO.getLastName());
-                user.setEmail(userDTO.getEmail());
+                user.setEmail(userDTO.getEmail().toLowerCase());
                 user.setImageUrl(userDTO.getImageUrl());
                 user.setActivated(userDTO.isActivated());
                 user.setLangKey(userDTO.getLangKey());
@@ -98,6 +103,7 @@ public class UserService {
                     .map(Optional::get)
                     .forEach(managedAuthorities::add);
                 userRepository.save(user);
+                userSearchRepository.save(user);
                 this.clearUserCaches(user);
                 log.debug("Changed Information for User: {}", user);
                 return user;
@@ -108,6 +114,7 @@ public class UserService {
     public void deleteUser(String login) {
         userRepository.findOneByLogin(login).ifPresent(user -> {
             userRepository.delete(user);
+            userSearchRepository.delete(user);
             this.clearUserCaches(user);
             log.debug("Deleted User: {}", user);
         });
@@ -237,7 +244,7 @@ public class UserService {
     private static User getUser(Map<String, Object> details) {
         User user = new User();
         user.setId((String) details.get("sub"));
-        user.setLogin((String) details.get("preferred_username"));
+        user.setLogin(((String) details.get("preferred_username")).toLowerCase());
         if (details.get("given_name") != null) {
             user.setFirstName((String) details.get("given_name"));
         }
@@ -248,14 +255,19 @@ public class UserService {
             user.setActivated((Boolean) details.get("email_verified"));
         }
         if (details.get("email") != null) {
-            user.setEmail((String) details.get("email"));
+            user.setEmail(((String) details.get("email")).toLowerCase());
         }
         if (details.get("langKey") != null) {
             user.setLangKey((String) details.get("langKey"));
         } else if (details.get("locale") != null) {
             String locale = (String) details.get("locale");
-            String langKey = locale.substring(0, locale.indexOf("-"));
-            user.setLangKey(langKey);
+            if (locale.contains("-")) {
+              String langKey = locale.substring(0, locale.indexOf("-"));
+              user.setLangKey(langKey);
+            } else if (locale.contains("_")) {
+              String langKey = locale.substring(0, locale.indexOf("_"));
+              user.setLangKey(langKey);
+            }
         }
         if (details.get("picture") != null) {
             user.setImageUrl((String) details.get("picture"));

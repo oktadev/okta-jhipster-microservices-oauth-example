@@ -12,13 +12,15 @@
         <!-- jhipster-needle-maven-repository -->
     </repositories>
 
+    <!-- jhipster-needle-distribution-management -->
+
     <properties>
         <!-- Build properties -->
         <maven.version>3.0.0</maven.version>
         <java.version>1.8</java.version>
         <scala.version>2.12.6</scala.version>
-        <node.version>v8.11.3</node.version>
-        <yarn.version>v1.6.0</yarn.version>
+        <node.version>v8.11.4</node.version>
+        <npm.version>6.4.1</npm.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <project.testresult.directory>${project.build.directory}/test-results</project.testresult.directory>
@@ -31,12 +33,13 @@
         <!-- These remain empty unless the corresponding profile is active -->
         <profile.no-liquibase />
         <profile.swagger />
+        <profile.tls />
 
         <!-- Dependency versions -->
-        <jhipster-dependencies.version>2.0.14</jhipster-dependencies.version>
+        <jhipster-dependencies.version>2.0.22</jhipster-dependencies.version>
         <!-- The spring-boot version should match the one managed by
         https://mvnrepository.com/artifact/io.github.jhipster/jhipster-dependencies/${jhipster-dependencies.version} -->
-        <spring-boot.version>2.0.3.RELEASE</spring-boot.version>
+        <spring-boot.version>2.0.5.RELEASE</spring-boot.version>
         <!-- The hibernate version should match the one managed by
         https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-dependencies/${spring-boot.version} -->
         <hibernate.version>5.2.17.Final</hibernate.version>
@@ -52,21 +55,23 @@
 
         <!-- Plugin versions -->
         <maven-clean-plugin.version>3.1.0</maven-clean-plugin.version>
-        <maven-compiler-plugin.version>3.7.0</maven-compiler-plugin.version>
+        <maven-compiler-plugin.version>3.8.0</maven-compiler-plugin.version>
         <maven-eclipse-plugin.version>2.10</maven-eclipse-plugin.version>
         <maven-enforcer-plugin.version>3.0.0-M2</maven-enforcer-plugin.version>
         <maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>
         <maven-surefire-plugin.version>2.22.0</maven-surefire-plugin.version>
         <maven-war-plugin.version>3.2.2</maven-war-plugin.version>
-        <dockerfile-maven-plugin.version>1.4.3</dockerfile-maven-plugin.version>
+        <dockerfile-maven-plugin.version>1.4.4</dockerfile-maven-plugin.version>
         <frontend-maven-plugin.version>1.6</frontend-maven-plugin.version>
-        <jacoco-maven-plugin.version>0.8.1</jacoco-maven-plugin.version>
-        <scala-maven-plugin.version>3.4.1</scala-maven-plugin.version>
-        <sonar-maven-plugin.version>3.4.0.905</sonar-maven-plugin.version>
+        <jacoco-maven-plugin.version>0.8.2</jacoco-maven-plugin.version>
+        <scala-maven-plugin.version>3.4.2</scala-maven-plugin.version>
+        <sonar-maven-plugin.version>3.5.0.1254</sonar-maven-plugin.version>
+        <git-commit-id-plugin.version>2.2.5</git-commit-id-plugin.version>
 
         <!-- Sonar properties -->
+        <sonar.host.url>http://localhost:9001</sonar.host.url>
         <sonar.exclusions>src/main/webapp/content/**/*.*, src/main/webapp/i18n/*.js, target/www/**/*.*</sonar.exclusions>
-        <sonar.issue.ignore.multicriteria>S3437,UndocumentedApi,BoldAndItalicTagsCheck</sonar.issue.ignore.multicriteria>
+        <sonar.issue.ignore.multicriteria>S3437,S4684,UndocumentedApi,BoldAndItalicTagsCheck</sonar.issue.ignore.multicriteria>
         <!-- Rule https://sonarcloud.io/coding_rules?open=Web%3ABoldAndItalicTagsCheck&rule_key=Web%3ABoldAndItalicTagsCheck is ignored. Even if we agree that using the "i" tag is an awful practice, this is what is recommended by http://fontawesome.io/examples/ -->
         <sonar.issue.ignore.multicriteria.BoldAndItalicTagsCheck.resourceKey>src/main/webapp/app/**/*.*</sonar.issue.ignore.multicriteria.BoldAndItalicTagsCheck.resourceKey>
         <sonar.issue.ignore.multicriteria.BoldAndItalicTagsCheck.ruleKey>Web:BoldAndItalicTagsCheck</sonar.issue.ignore.multicriteria.BoldAndItalicTagsCheck.ruleKey>
@@ -76,6 +81,9 @@
         <!-- Rule https://sonarcloud.io/coding_rules?open=squid%3AUndocumentedApi&rule_key=squid%3AUndocumentedApi is ignored, as we want to follow "clean code" guidelines and classes, methods and arguments names should be self-explanatory -->
         <sonar.issue.ignore.multicriteria.UndocumentedApi.resourceKey>src/main/java/**/*</sonar.issue.ignore.multicriteria.UndocumentedApi.resourceKey>
         <sonar.issue.ignore.multicriteria.UndocumentedApi.ruleKey>squid:UndocumentedApi</sonar.issue.ignore.multicriteria.UndocumentedApi.ruleKey>
+        <!-- Rule https://sonarcloud.io/coding_rules?open=squid%3AS4684&rule_key=squid%3AS4684 -->
+        <sonar.issue.ignore.multicriteria.S4684.resourceKey>src/main/java/**/*</sonar.issue.ignore.multicriteria.S4684.resourceKey>
+        <sonar.issue.ignore.multicriteria.S4684.ruleKey>squid:S4684</sonar.issue.ignore.multicriteria.S4684.ruleKey>
         <sonar.jacoco.reportPaths>${project.testresult.directory}/coverage/jacoco/jacoco.exec</sonar.jacoco.reportPaths>
         <sonar.java.codeCoveragePlugin>jacoco</sonar.java.codeCoveragePlugin>
         <sonar.testExecutionReportPaths>${project.testresult.directory}/jest/TESTS-results-sonar.xml</sonar.testExecutionReportPaths>
@@ -145,10 +153,6 @@
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-json-org</artifactId>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.module</groupId>
@@ -274,6 +278,33 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
+        </dependency>
+        <!-- Spring Data Jest dependencies for Elasticsearch -->
+        <dependency>
+            <groupId>com.github.vanroy</groupId>
+            <artifactId>spring-boot-starter-data-jest</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- log4j needed to create embedded elasticsearch instance -->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>2.7</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>2.7</version>
+        </dependency>
+        <!-- end of Spring Data Jest dependencies -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-logging</artifactId>
         </dependency>
         <dependency>
@@ -310,6 +341,7 @@
         <dependency>
             <groupId>org.zalando</groupId>
             <artifactId>problem-spring-web</artifactId>
+            <version>0.24.0-RC.0</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.security.oauth</groupId>
@@ -700,8 +732,8 @@
                                         <artifactId>frontend-maven-plugin</artifactId>
                                         <versionRange>${frontend-maven-plugin.version}</versionRange>
                                         <goals>
-                                            <goal>install-node-and-yarn</goal>
-                                            <goal>yarn</goal>
+                                            <goal>install-node-and-npm</goal>
+                                            <goal>npm</goal>
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>
@@ -729,7 +761,33 @@
             </properties>
         </profile>
         <profile>
+            <id>tls</id>
+            <properties>
+                <profile.tls>,tls</profile.tls>
+            </properties>
+        </profile>
+        <profile>
             <id>webpack</id>
+            <activation>
+                <file>
+                    <missing>${basedir}/target/www/app/main.bundle.js</missing>
+                </file>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-undertow</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-devtools</artifactId>
+                    <optional>true</optional>
+                </dependency>
+                <dependency>
+                    <groupId>com.h2database</groupId>
+                    <artifactId>h2</artifactId>
+                </dependency>
+            </dependencies>
             <build>
                 <plugins>
                     <plugin>
@@ -738,30 +796,51 @@
                         <version>${frontend-maven-plugin.version}</version>
                         <executions>
                             <execution>
-                                <id>install node and yarn</id>
+                                <id>install node and npm</id>
                                 <goals>
-                                    <goal>install-node-and-yarn</goal>
+                                    <goal>install-node-and-npm</goal>
                                 </goals>
                                 <configuration>
                                     <nodeVersion>${node.version}</nodeVersion>
-                                    <yarnVersion>${yarn.version}</yarnVersion>
+                                    <npmVersion>${npm.version}</npmVersion>
                                 </configuration>
                             </execution>
                             <execution>
                                 <id>webpack build dev</id>
                                 <goals>
-                                    <goal>yarn</goal>
+                                    <goal>npm</goal>
                                 </goals>
                                 <phase>generate-resources</phase>
                                 <configuration>
                                     <arguments>run webpack:build</arguments>
-                                    <yarnInheritsProxyConfigFromMaven>false</yarnInheritsProxyConfigFromMaven>
+                                    <npmInheritsProxyConfigFromMaven>false</npmInheritsProxyConfigFromMaven>
                                 </configuration>
                             </execution>
                         </executions>
                     </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-war-plugin</artifactId>
+                        <version>${maven-war-plugin.version}</version>
+                        <configuration>
+                            <failOnMissingWebXml>false</failOnMissingWebXml>
+                            <warSourceDirectory>target/www/</warSourceDirectory>
+                            <webResources>
+                                <resource>
+                                    <directory>src/main/webapp</directory>
+                                    <includes>
+                                        <include>WEB-INF/**</include>
+                                    </includes>
+                                </resource>
+                            </webResources>
+                        </configuration>
+                    </plugin>
                 </plugins>
             </build>
+            <properties>
+                <!-- default Spring profiles -->
+                <spring.profiles.active>dev${profile.no-liquibase}</spring.profiles.active>
+            </properties>
         </profile>
         <profile>
             <id>dev</id>
@@ -806,7 +885,7 @@
             </build>
             <properties>
                 <!-- default Spring profiles -->
-                <spring.profiles.active>dev${profile.no-liquibase}</spring.profiles.active>
+                <spring.profiles.active>dev${profile.tls}${profile.no-liquibase}</spring.profiles.active>
             </properties>
         </profile>
         <profile>
@@ -869,19 +948,19 @@
                         <version>${frontend-maven-plugin.version}</version>
                         <executions>
                             <execution>
-                                <id>install node and yarn</id>
+                                <id>install node and npm</id>
                                 <goals>
-                                    <goal>install-node-and-yarn</goal>
+                                    <goal>install-node-and-npm</goal>
                                 </goals>
                                 <configuration>
                                     <nodeVersion>${node.version}</nodeVersion>
-                                    <yarnVersion>${yarn.version}</yarnVersion>
+                                    <npmVersion>${npm.version}</npmVersion>
                                 </configuration>
                             </execution>
                             <execution>
-                                <id>yarn install</id>
+                                <id>npm install</id>
                                 <goals>
-                                    <goal>yarn</goal>
+                                    <goal>npm</goal>
                                 </goals>
                                 <configuration>
                                     <arguments>install</arguments>
@@ -890,23 +969,23 @@
                             <execution>
                                 <id>webpack build test</id>
                                 <goals>
-                                    <goal>yarn</goal>
+                                    <goal>npm</goal>
                                 </goals>
                                 <phase>test</phase>
                                 <configuration>
                                     <arguments>run webpack:test</arguments>
-                                    <yarnInheritsProxyConfigFromMaven>false</yarnInheritsProxyConfigFromMaven>
+                                    <npmInheritsProxyConfigFromMaven>false</npmInheritsProxyConfigFromMaven>
                                 </configuration>
                             </execution>
                             <execution>
                                 <id>webpack build prod</id>
                                 <goals>
-                                    <goal>yarn</goal>
+                                    <goal>npm</goal>
                                 </goals>
                                 <phase>generate-resources</phase>
                                 <configuration>
                                     <arguments>run webpack:prod</arguments>
-                                    <yarnInheritsProxyConfigFromMaven>false</yarnInheritsProxyConfigFromMaven>
+                                    <npmInheritsProxyConfigFromMaven>false</npmInheritsProxyConfigFromMaven>
                                 </configuration>
                             </execution>
                         </executions>
@@ -914,7 +993,7 @@
                     <plugin>
                         <groupId>pl.project13.maven</groupId>
                         <artifactId>git-commit-id-plugin</artifactId>
-                        <version>2.2.4</version>
+                        <version>${git-commit-id-plugin.version}</version>
                             <executions>
                                 <execution>
                                     <goals>
@@ -1039,38 +1118,6 @@
         </profile>
         <profile>
             <!--
-                Profile for monitoring the application with Graphite.
-            -->
-            <id>graphite</id>
-            <dependencies>
-                <dependency>
-                    <groupId>io.dropwizard.metrics</groupId>
-                    <artifactId>metrics-graphite</artifactId>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
-            <!--
-                Profile for monitoring the application with Prometheus.
-            -->
-            <id>prometheus</id>
-            <dependencies>
-                <dependency>
-                    <groupId>io.prometheus</groupId>
-                    <artifactId>simpleclient</artifactId>
-                </dependency>
-                <dependency>
-                    <groupId>io.prometheus</groupId>
-                    <artifactId>simpleclient_servlet</artifactId>
-                </dependency>
-                <dependency>
-                    <groupId>io.prometheus</groupId>
-                    <artifactId>simpleclient_dropwizard</artifactId>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
-            <!--
                 Profile for tracing requests with Zipkin.
             -->
             <id>zipkin</id>
@@ -1105,6 +1152,23 @@
             <id>heroku</id>
             <build>
                 <plugins>
+                    <plugin>
+                        <groupId>org.liquibase</groupId>
+                        <artifactId>liquibase-maven-plugin</artifactId>
+                        <configuration combine.self="override">
+                            <changeLogFile>src/main/resources/config/liquibase/master.xml</changeLogFile>
+                            <diffChangeLogFile>src/main/resources/config/liquibase/changelog/${maven.build.timestamp}_changelog.xml</diffChangeLogFile>
+                            <driver></driver>
+                            <url>${env.JDBC_DATABASE_URL}</url>
+                            <defaultSchemaName></defaultSchemaName>
+                            <username>${env.JDBC_DATABASE_USERNAME}</username>
+                            <password>${env.JDBC_DATABASE_PASSWORD}</password>
+                            <referenceUrl>hibernate:spring:com.okta.developer.gateway.domain?dialect=org.hibernate.dialect.PostgreSQL82Dialect&amp;hibernate.physical_naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy&amp;hibernate.implicit_naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy</referenceUrl>
+                            <verbose>true</verbose>
+                            <logging>debug</logging>
+                            <promptOnNonLocalDatabase>false</promptOnNonLocalDatabase>
+                        </configuration>
+                    </plugin>
                     <plugin>
                         <artifactId>maven-clean-plugin</artifactId>
                         <version>${maven-clean-plugin.version}</version>

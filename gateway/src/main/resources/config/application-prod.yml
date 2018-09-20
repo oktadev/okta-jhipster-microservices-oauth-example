@@ -37,12 +37,15 @@ spring:
         url: jdbc:postgresql://localhost:5432/gateway
         username: gateway
         password:
+        hikari:
+            auto-commit: false
     jpa:
         database-platform: io.github.jhipster.domain.util.FixedPostgreSQL82Dialect
         database: POSTGRESQL
         show-sql: false
         properties:
             hibernate.id.new_generator_mappings: true
+            hibernate.connection.provider_disables_autocommit: true
             hibernate.cache.use_second_level_cache: true
             hibernate.cache.use_query_cache: false
             hibernate.generate_statistics: false
@@ -50,6 +53,9 @@ spring:
             hibernate.cache.hazelcast.instance_name: gateway
             hibernate.cache.use_minimal_puts: true
             hibernate.cache.hazelcast.use_lite_member: true
+    data:
+        jest:
+            uri: http://localhost:9200
     liquibase:
         contexts: prod
     mail:
@@ -67,7 +73,7 @@ spring:
                 enabled: true
 
 # ===================================================================
-# To enable SSL, generate a certificate using:
+# To enable TLS in production, generate a certificate using:
 # keytool -genkey -alias gateway -storetype PKCS12 -keyalg RSA -keysize 2048 -keystore keystore.p12 -validity 3650
 #
 # You can also use Let's Encrypt:
@@ -78,8 +84,8 @@ spring:
 # server:
 #    port: 443
 #    ssl:
-#        key-store: keystore.p12
-#        key-store-password: <your-password>
+#        key-store: classpath:config/tls/keystore.p12
+#        key-store-password: password
 #        key-store-type: PKCS12
 #        key-alias: gateway
 #        # The ciphers suite enforce the security by deactivating some old and deprecated SSL cipher, this list was tested against SSL Labs (https://www.ssllabs.com/ssltest/)

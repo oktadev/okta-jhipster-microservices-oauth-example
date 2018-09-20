@@ -7,6 +7,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import javax.persistence.*;
 import javax.validation.constraints.*;
 
+import org.springframework.data.elasticsearch.annotations.Document;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
@@ -18,6 +19,7 @@ import java.util.Objects;
 @Entity
 @Table(name = "tag")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+@Document(indexName = "tag")
 public class Tag implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -35,7 +37,7 @@ public class Tag implements Serializable {
     @ManyToMany(mappedBy = "tags")
     @JsonIgnore
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-    private Set<Entry> entries = new HashSet<>();
+    private Set<Post> posts = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
@@ -59,29 +61,29 @@ public class Tag implements Serializable {
         this.name = name;
     }
 
-    public Set<Entry> getEntries() {
-        return entries;
+    public Set<Post> getPosts() {
+        return posts;
     }
 
-    public Tag entries(Set<Entry> entries) {
-        this.entries = entries;
+    public Tag posts(Set<Post> posts) {
+        this.posts = posts;
         return this;
     }
 
-    public Tag addEntry(Entry entry) {
-        this.entries.add(entry);
-        entry.getTags().add(this);
+    public Tag addPost(Post post) {
+        this.posts.add(post);
+        post.getTags().add(this);
         return this;
     }
 
-    public Tag removeEntry(Entry entry) {
-        this.entries.remove(entry);
-        entry.getTags().remove(this);
+    public Tag removePost(Post post) {
+        this.posts.remove(post);
+        post.getTags().remove(this);
         return this;
     }
 
-    public void setEntries(Set<Entry> entries) {
-        this.entries = entries;
+    public void setPosts(Set<Post> posts) {
+        this.posts = posts;
     }
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
 

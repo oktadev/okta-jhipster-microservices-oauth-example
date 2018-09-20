@@ -4,6 +4,7 @@ import com.okta.developer.blog.BlogApp;
 import com.okta.developer.blog.domain.Authority;
 import com.okta.developer.blog.domain.User;
 import com.okta.developer.blog.repository.UserRepository;
+import com.okta.developer.blog.repository.search.UserSearchRepository;
 import com.okta.developer.blog.security.AuthoritiesConstants;
 
 import com.okta.developer.blog.service.UserService;
@@ -14,7 +15,6 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cache.CacheManager;
@@ -31,7 +31,7 @@ import java.time.Instant;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -64,6 +64,14 @@ public class UserResourceIntTest {
     @Autowired
     private UserRepository userRepository;
 
+    /**
+     * This repository is mocked in the com.okta.developer.blog.repository.search test package.
+     *
+     * @see com.okta.developer.blog.repository.search.UserSearchRepositoryMockConfiguration
+     */
+    @Autowired
+    private UserSearchRepository mockUserSearchRepository;
+
     @Autowired
     private UserService userService;
 
@@ -91,10 +99,10 @@ public class UserResourceIntTest {
 
     @Before
     public void setup() {
-        MockitoAnnotations.initMocks(this);
         cacheManager.getCache(UserRepository.USERS_BY_LOGIN_CACHE).clear();
         cacheManager.getCache(UserRepository.USERS_BY_EMAIL_CACHE).clear();
-        UserResource userResource = new UserResource(userService);
+        UserResource userResource = new UserResource(userService, mockUserSearchRepository);
+
         this.restUserMockMvc = MockMvcBuilders.standaloneSetup(userResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)
@@ -133,6 +141,7 @@ public class UserResourceIntTest {
     public void getAllUsers() throws Exception {
         // Initialize the database
         userRepository.saveAndFlush(user);
+        mockUserSearchRepository.save(user);
 
         // Get all the users
         restUserMockMvc.perform(get("/api/users?sort=id,desc")
@@ -152,6 +161,7 @@ public class UserResourceIntTest {
     public void getUser() throws Exception {
         // Initialize the database
         userRepository.saveAndFlush(user);
+        mockUserSearchRepository.save(user);
 
         assertThat(cacheManager.getCache(UserRepository.USERS_BY_LOGIN_CACHE).get(user.getLogin())).isNull();
 
@@ -174,18 +184,6 @@ public class UserResourceIntTest {
     public void getNonExistingUser() throws Exception {
         restUserMockMvc.perform(get("/api/users/unknown"))
             .andExpect(status().isNotFound());
-    }
-
-    @Test
-    @Transactional
-    public void getAllAuthorities() throws Exception {
-        restUserMockMvc.perform(get("/api/users/authorities")
-            .accept(TestUtil.APPLICATION_JSON_UTF8)
-            .contentType(TestUtil.APPLICATION_JSON_UTF8))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-            .andExpect(jsonPath("$").isArray())
-            .andExpect(jsonPath("$").value(containsInAnyOrder(AuthoritiesConstants.USER, AuthoritiesConstants.ADMIN)));
     }
 
     @Test
@@ -272,7 +270,7 @@ public class UserResourceIntTest {
     }
 
     @Test
-    public void testAuthorityEquals() throws Exception {
+    public void testAuthorityEquals() {
         Authority authorityA = new Authority();
         assertThat(authorityA).isEqualTo(authorityA);
         assertThat(authorityA).isNotEqualTo(null);
