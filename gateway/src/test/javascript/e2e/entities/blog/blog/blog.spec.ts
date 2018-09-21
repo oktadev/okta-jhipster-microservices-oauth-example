@@ -1,45 +1,66 @@
-import { browser } from 'protractor';
-import { NavBarPage } from './../../../page-objects/jhi-page-objects';
-import { BlogComponentsPage, BlogUpdatePage } from './blog.page-object';
+/* tslint:disable no-unused-expression */
+import { browser, ExpectedConditions as ec } from 'protractor';
+import { NavBarPage, SignInPage } from '../../../page-objects/jhi-page-objects';
+
+import { BlogComponentsPage, BlogDeleteDialog, BlogUpdatePage } from './blog.page-object';
+
+const expect = chai.expect;
 
 describe('Blog e2e test', () => {
     let navBarPage: NavBarPage;
+    let signInPage: SignInPage;
     let blogUpdatePage: BlogUpdatePage;
     let blogComponentsPage: BlogComponentsPage;
+    let blogDeleteDialog: BlogDeleteDialog;
 
-    beforeAll(() => {
-        browser.get('/');
-        browser.waitForAngular();
+    before(async () => {
+        await browser.get('/');
         navBarPage = new NavBarPage();
-        navBarPage.getSignInPage().loginWithOAuth('admin', 'admin');
-        browser.waitForAngular();
+        signInPage = await navBarPage.getSignInPage();
+        await signInPage.loginWithOAuth('admin', 'admin');
+        await browser.wait(ec.visibilityOf(navBarPage.entityMenu), 5000);
     });
 
-    it('should load Blogs', () => {
-        navBarPage.goToEntity('blog');
+    it('should load Blogs', async () => {
+        await navBarPage.goToEntity('blog');
         blogComponentsPage = new BlogComponentsPage();
-        expect(blogComponentsPage.getTitle()).toMatch(/gatewayApp.blogBlog.home.title/);
+        expect(await blogComponentsPage.getTitle()).to.eq('gatewayApp.blogBlog.home.title');
     });
 
-    it('should load create Blog page', () => {
-        blogComponentsPage.clickOnCreateButton();
+    it('should load create Blog page', async () => {
+        await blogComponentsPage.clickOnCreateButton();
         blogUpdatePage = new BlogUpdatePage();
-        expect(blogUpdatePage.getPageTitle()).toMatch(/gatewayApp.blogBlog.home.createOrEditLabel/);
-        blogUpdatePage.cancel();
+        expect(await blogUpdatePage.getPageTitle()).to.eq('gatewayApp.blogBlog.home.createOrEditLabel');
+        await blogUpdatePage.cancel();
     });
 
-    it('should create and save Blogs', () => {
-        blogComponentsPage.clickOnCreateButton();
-        blogUpdatePage.setNameInput('name');
-        expect(blogUpdatePage.getNameInput()).toMatch('name');
-        blogUpdatePage.setHandleInput('handle');
-        expect(blogUpdatePage.getHandleInput()).toMatch('handle');
-        blogUpdatePage.userSelectLastOption();
-        blogUpdatePage.save();
-        expect(blogUpdatePage.getSaveButton().isPresent()).toBeFalsy();
+    it('should create and save Blogs', async () => {
+        const nbButtonsBeforeCreate = await blogComponentsPage.countDeleteButtons();
+
+        await blogComponentsPage.clickOnCreateButton();
+        await blogUpdatePage.setNameInput('name');
+        expect(await blogUpdatePage.getNameInput()).to.eq('name');
+        await blogUpdatePage.setHandleInput('handle');
+        expect(await blogUpdatePage.getHandleInput()).to.eq('handle');
+        await blogUpdatePage.userSelectLastOption();
+        await blogUpdatePage.save();
+        expect(await blogUpdatePage.getSaveButton().isPresent()).to.be.false;
+
+        expect(await blogComponentsPage.countDeleteButtons()).to.eq(nbButtonsBeforeCreate + 1);
     });
 
-    afterAll(() => {
-        navBarPage.autoSignOut();
+    it('should delete last Blog', async () => {
+        const nbButtonsBeforeDelete = await blogComponentsPage.countDeleteButtons();
+        await blogComponentsPage.clickOnLastDeleteButton();
+
+        blogDeleteDialog = new BlogDeleteDialog();
+        expect(await blogDeleteDialog.getDialogTitle()).to.eq('gatewayApp.blogBlog.delete.question');
+        await blogDeleteDialog.clickOnConfirmButton();
+
+        expect(await blogComponentsPage.countDeleteButtons()).to.eq(nbButtonsBeforeDelete - 1);
+    });
+
+    after(async () => {
+        await navBarPage.autoSignOut();
     });
 });

@@ -11,12 +11,18 @@ services:
             - SECURITY_OAUTH2_CLIENT_CLIENT_SECRET=${SECURITY_OAUTH2_CLIENT_CLIENT_SECRET}
             - SECURITY_OAUTH2_RESOURCE_USER_INFO_URI=${SECURITY_OAUTH2_RESOURCE_USER_INFO_URI}
             - JHIPSTER_SLEEP=30
+            - SPRING_DATA_JEST_URI=http://blog-elasticsearch:9200
             - JHIPSTER_REGISTRY_PASSWORD=admin
     blog-postgresql:
         image: postgres:10.4
         environment:
             - POSTGRES_USER=blog
             - POSTGRES_PASSWORD=
+    blog-elasticsearch:
+        image: elasticsearch:5.6.5
+        command: -Enetwork.host=0.0.0.0 -Ediscovery.type=single-node
+        environment:
+            - ES_JAVA_OPTS=-Xms512m -Xmx512m
     
     gateway-app:
         image: gateway
@@ -32,6 +38,7 @@ services:
             - SECURITY_OAUTH2_CLIENT_SCOPE=openid profile email
             - SECURITY_OAUTH2_RESOURCE_USER_INFO_URI=${SECURITY_OAUTH2_RESOURCE_USER_INFO_URI}
             - JHIPSTER_SLEEP=30
+            - SPRING_DATA_JEST_URI=http://gateway-elasticsearch:9200
             - JHIPSTER_REGISTRY_PASSWORD=admin
         ports:
             - 8080:8080
@@ -40,6 +47,11 @@ services:
         environment:
             - POSTGRES_USER=gateway
             - POSTGRES_PASSWORD=
+    gateway-elasticsearch:
+        image: elasticsearch:5.6.5
+        command: -Enetwork.host=0.0.0.0 -Ediscovery.type=single-node
+        environment:
+            - ES_JAVA_OPTS=-Xms512m -Xmx512m
     
     store-app:
         image: store
@@ -53,9 +65,15 @@ services:
             - SECURITY_OAUTH2_CLIENT_CLIENT_SECRET=${SECURITY_OAUTH2_CLIENT_CLIENT_SECRET}
             - SECURITY_OAUTH2_RESOURCE_USER_INFO_URI=${SECURITY_OAUTH2_RESOURCE_USER_INFO_URI}
             - JHIPSTER_SLEEP=30
+            - SPRING_DATA_JEST_URI=http://store-elasticsearch:9200
             - JHIPSTER_REGISTRY_PASSWORD=admin
     store-mongodb:
         image: mongo:3.6.3
+    store-elasticsearch:
+        image: elasticsearch:5.6.5
+        command: -Enetwork.host=0.0.0.0 -Ediscovery.type=single-node
+        environment:
+            - ES_JAVA_OPTS=-Xms512m -Xmx512m
     
     jhipster-registry:
         extends:

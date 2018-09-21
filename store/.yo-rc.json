@@ -1,38 +1,41 @@
 {
   "generator-jhipster": {
-    "promptValues": {
-      "packageName": "com.okta.developer.store",
-      "nativeLanguage": "en"
-    },
-    "jhipsterVersion": "5.1.0",
     "applicationType": "microservice",
-    "baseName": "store",
-    "packageName": "com.okta.developer.store",
-    "packageFolder": "com/okta/developer/store",
-    "serverPort": "8082",
-    "authenticationType": "oauth2",
-    "cacheProvider": "hazelcast",
-    "enableHibernateCache": false,
-    "websocket": false,
+    "clientPackageManager": "npm",
     "databaseType": "mongodb",
     "devDatabaseType": "mongodb",
-    "prodDatabaseType": "mongodb",
-    "searchEngine": false,
-    "messageBroker": false,
-    "serviceDiscoveryType": "eureka",
-    "buildTool": "maven",
+    "enableHibernateCache": false,
     "enableSwaggerCodegen": false,
-    "jwtSecretKey": "4e6b5e9a3551e5d8548af5334c8953723d76fbfd",
     "enableTranslation": true,
-    "testFrameworks": [],
     "jhiPrefix": "jhi",
-    "clientPackageManager": "yarn",
-    "nativeLanguage": "en",
     "languages": [
-      "en"
+      "en",
+      "fr"
     ],
+    "messageBroker": false,
+    "nativeLanguage": "en",
+    "packageName": "com.okta.developer.store",
+    "packageFolder": "com/okta/developer/store",
+    "prodDatabaseType": "mongodb",
+    "searchEngine": "elasticsearch",
+    "serviceDiscoveryType": "eureka",
     "skipClient": true,
+    "skipServer": false,
+    "testFrameworks": [],
+    "useSass": false,
+    "websocket": false,
+    "baseName": "store",
+    "authenticationType": "oauth2",
+    "serverPort": "8082",
+    "jhipsterVersion": "5.3.4",
+    "buildTool": "maven",
+    "cacheProvider": "hazelcast",
+    "clientFramework": "angularX",
     "skipUserManagement": true,
+    "herokuAppName": "okta-store",
     "herokuDeployType": "git"
-  }
+  },
+  "entities": [
+    "Product"
+  ]
 }

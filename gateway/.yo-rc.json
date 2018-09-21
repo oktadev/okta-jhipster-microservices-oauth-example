@@ -1,39 +1,46 @@
 {
   "generator-jhipster": {
-    "promptValues": {
-      "packageName": "com.okta.developer.gateway",
-      "nativeLanguage": "en"
-    },
-    "jhipsterVersion": "5.1.0",
     "applicationType": "gateway",
-    "baseName": "gateway",
-    "packageName": "com.okta.developer.gateway",
-    "packageFolder": "com/okta/developer/gateway",
-    "serverPort": "8080",
-    "authenticationType": "oauth2",
-    "cacheProvider": "hazelcast",
-    "enableHibernateCache": true,
-    "websocket": false,
+    "clientPackageManager": "npm",
     "databaseType": "sql",
     "devDatabaseType": "h2Disk",
-    "prodDatabaseType": "postgresql",
-    "searchEngine": false,
-    "messageBroker": false,
-    "serviceDiscoveryType": "eureka",
-    "buildTool": "maven",
+    "enableHibernateCache": true,
     "enableSwaggerCodegen": false,
-    "clientFramework": "angularX",
-    "useSass": false,
-    "clientPackageManager": "yarn",
+    "enableTranslation": true,
+    "jhiPrefix": "jhi",
+    "languages": [
+      "en",
+      "fr"
+    ],
+    "messageBroker": false,
+    "nativeLanguage": "en",
+    "packageName": "com.okta.developer.gateway",
+    "packageFolder": "com/okta/developer/gateway",
+    "prodDatabaseType": "postgresql",
+    "searchEngine": "elasticsearch",
+    "serviceDiscoveryType": "eureka",
+    "skipClient": false,
+    "skipServer": false,
     "testFrameworks": [
       "protractor"
     ],
-    "jhiPrefix": "jhi",
-    "enableTranslation": true,
-    "nativeLanguage": "en",
-    "languages": [
-      "en"
-    ],
+    "useSass": false,
+    "websocket": false,
+    "baseName": "gateway",
+    "authenticationType": "oauth2",
+    "jhipsterVersion": "5.3.4",
+    "buildTool": "maven",
+    "cacheProvider": "ehcache",
+    "clientFramework": "angularX",
+    "serverPort": "8080",
+    "skipUserManagement": true,
+    "herokuAppName": "okta-gateway",
     "herokuDeployType": "git"
-  }
+  },
+  "entities": [
+    "Blog",
+    "Post",
+    "Tag",
+    "Product"
+  ]
 }

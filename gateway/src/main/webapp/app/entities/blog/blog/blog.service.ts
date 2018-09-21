@@ -12,6 +12,7 @@ type EntityArrayResponseType = HttpResponse<IBlog[]>;
 @Injectable({ providedIn: 'root' })
 export class BlogService {
     private resourceUrl = SERVER_API_URL + 'blog/api/blogs';
+    private resourceSearchUrl = SERVER_API_URL + 'blog/api/_search/blogs';
 
     constructor(private http: HttpClient) {}
 
@@ -34,5 +35,10 @@ export class BlogService {
 
     delete(id: number): Observable<HttpResponse<any>> {
         return this.http.delete<any>(`${this.resourceUrl}/${id}`, { observe: 'response' });
+    }
+
+    search(req?: any): Observable<EntityArrayResponseType> {
+        const options = createRequestOption(req);
+        return this.http.get<IBlog[]>(this.resourceSearchUrl, { params: options, observe: 'response' });
     }
 }

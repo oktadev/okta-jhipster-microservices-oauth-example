@@ -5,7 +5,8 @@
             "home": {
                 "title": "Tags",
                 "createLabel": "Create a new Tag",
-                "createOrEditLabel": "Create or edit a Tag"
+                "createOrEditLabel": "Create or edit a Tag",
+                "search": "Search for Tag"
             },
             "delete": {
                 "question": "Are you sure you want to delete Tag {{ id }}?"
@@ -14,7 +15,7 @@
                 "title": "Tag"
             },
             "name": "Name",
-            "entry": "Entry"
+            "post": "Post"
         }
     },
     "blogApp": {

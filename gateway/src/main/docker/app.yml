@@ -15,12 +15,17 @@ services:
             - SECURITY_OAUTH2_CLIENT_SCOPE=openid profile email
             - SECURITY_OAUTH2_RESOURCE_USER_INFO_URI=http://keycloak:9080/auth/realms/jhipster/protocol/openid-connect/userinfo
             - JHIPSTER_SLEEP=30 # gives time for the JHipster Registry to boot before the application
+            - SPRING_DATA_JEST_URI=http://gateway-elasticsearch:9200
         ports:
             - 8080:8080
     gateway-postgresql:
         extends:
             file: postgresql.yml
             service: gateway-postgresql
+    gateway-elasticsearch:
+        extends:
+            file: elasticsearch.yml
+            service: gateway-elasticsearch
     jhipster-registry:
         extends:
             file: jhipster-registry.yml

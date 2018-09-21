@@ -1,11 +1,11 @@
-import { IEntry } from 'app/shared/model/blog/entry.model';
+import { IPost } from 'app/shared/model/blog/post.model';
 
 export interface ITag {
     id?: number;
     name?: string;
-    entries?: IEntry[];
+    posts?: IPost[];
 }
 
 export class Tag implements ITag {
-    constructor(public id?: number, public name?: string, public entries?: IEntry[]) {}
+    constructor(public id?: number, public name?: string, public posts?: IPost[]) {}
 }

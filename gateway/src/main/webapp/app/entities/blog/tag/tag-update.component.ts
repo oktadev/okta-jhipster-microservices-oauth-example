@@ -6,8 +6,8 @@ import { JhiAlertService } from 'ng-jhipster';
 
 import { ITag } from 'app/shared/model/blog/tag.model';
 import { TagService } from './tag.service';
-import { IEntry } from 'app/shared/model/blog/entry.model';
-import { EntryService } from 'app/entities/blog/entry';
+import { IPost } from 'app/shared/model/blog/post.model';
+import { PostService } from 'app/entities/blog/post';
 
 @Component({
     selector: 'jhi-tag-update',
@@ -17,12 +17,12 @@ export class TagUpdateComponent implements OnInit {
     private _tag: ITag;
     isSaving: boolean;
 
-    entries: IEntry[];
+    posts: IPost[];
 
     constructor(
         private jhiAlertService: JhiAlertService,
         private tagService: TagService,
-        private entryService: EntryService,
+        private postService: PostService,
         private activatedRoute: ActivatedRoute
     ) {}
 
@@ -31,9 +31,9 @@ export class TagUpdateComponent implements OnInit {
         this.activatedRoute.data.subscribe(({ tag }) => {
             this.tag = tag;
         });
-        this.entryService.query().subscribe(
-            (res: HttpResponse<IEntry[]>) => {
-                this.entries = res.body;
+        this.postService.query().subscribe(
+            (res: HttpResponse<IPost[]>) => {
+                this.posts = res.body;
             },
             (res: HttpErrorResponse) => this.onError(res.message)
         );
@@ -69,7 +69,7 @@ export class TagUpdateComponent implements OnInit {
         this.jhiAlertService.error(errorMessage, null, null);
     }
 
-    trackEntryById(index: number, item: IEntry) {
+    trackPostById(index: number, item: IPost) {
         return item.id;
     }
 

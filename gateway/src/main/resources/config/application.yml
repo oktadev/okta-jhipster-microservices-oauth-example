@@ -42,6 +42,7 @@ ribbon:
         enabled: true
 # See http://cloud.spring.io/spring-cloud-netflix/spring-cloud-netflix.html
 zuul: # those values must be configured depending on the application specific needs
+    sensitive-headers: Cookie,Set-Cookie #see https://github.com/spring-cloud/spring-cloud-netflix/issues/3126
     host:
         max-total-connections: 1000
         max-per-route-connections: 100
@@ -62,7 +63,7 @@ management:
         web:
             base-path: /management
             exposure:
-                include: ["configprops", "env", "health", "info", "threaddump"]
+                include: ["configprops", "env", "health", "info", "threaddump", "logfile" ]
     endpoint:
         health:
             show-details: when_authorized
@@ -76,6 +77,8 @@ management:
         enabled: false # http://micrometer.io/ is disabled by default, as we use http://metrics.dropwizard.io/ instead
 
 spring:
+    autoconfigure:
+        exclude: org.springframework.boot.autoconfigure.data.elasticsearch.ElasticsearchAutoConfiguration,org.springframework.boot.autoconfigure.data.elasticsearch.ElasticsearchDataAutoConfiguration
     application:
         name: gateway
     jpa:
@@ -166,6 +169,9 @@ jhipster:
         contact-email:
         license:
         license-url:
+
+logging:
+    file: target/gateway.log
 
 # ===================================================================
 # Application specific properties

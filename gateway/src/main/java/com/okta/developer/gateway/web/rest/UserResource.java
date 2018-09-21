@@ -1,11 +1,13 @@
 package com.okta.developer.gateway.web.rest;
 
 import com.okta.developer.gateway.config.Constants;
-import com.codahale.metrics.annotation.Timed;
+import com.okta.developer.gateway.domain.User;
+import com.okta.developer.gateway.repository.search.UserSearchRepository;
 import com.okta.developer.gateway.security.AuthoritiesConstants;
 import com.okta.developer.gateway.service.UserService;
 import com.okta.developer.gateway.service.dto.UserDTO;
 import com.okta.developer.gateway.web.rest.util.PaginationUtil;
+import com.codahale.metrics.annotation.Timed;
 import io.github.jhipster.web.util.ResponseUtil;
 
 import org.slf4j.Logger;
@@ -15,10 +17,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
+import static org.elasticsearch.index.query.QueryBuilders.*;
 
 /**
  * REST controller for managing users.
@@ -52,9 +58,12 @@ public class UserResource {
 
     private final UserService userService;
 
-    public UserResource(UserService userService) {
+    private final UserSearchRepository userSearchRepository;
+
+    public UserResource(UserService userService, UserSearchRepository userSearchRepository) {
 
         this.userService = userService;
+        this.userSearchRepository = userSearchRepository;
     }
 
     /**
@@ -65,7 +74,6 @@ public class UserResource {
      */
     @GetMapping("/users")
     @Timed
-    @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<List<UserDTO>> getAllUsers(Pageable pageable) {
         final Page<UserDTO> page = userService.getAllManagedUsers(pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/users");
@@ -77,7 +85,7 @@ public class UserResource {
      */
     @GetMapping("/users/authorities")
     @Timed
-    @Secured(AuthoritiesConstants.ADMIN)
+    @PreAuthorize("hasRole(\"" + AuthoritiesConstants.ADMIN + "\")")
     public List<String> getAuthorities() {
         return userService.getAuthorities();
     }
@@ -95,5 +103,20 @@ public class UserResource {
         return ResponseUtil.wrapOrNotFound(
             userService.getUserWithAuthoritiesByLogin(login)
                 .map(UserDTO::new));
+    }
+
+    /**
+     * SEARCH /_search/users/:query : search for the User corresponding
+     * to the query.
+     *
+     * @param query the query to search
+     * @return the result of the search
+     */
+    @GetMapping("/_search/users/{query}")
+    @Timed
+    public List<User> search(@PathVariable String query) {
+        return StreamSupport
+            .stream(userSearchRepository.search(queryStringQuery(query)).spliterator(), false)
+            .collect(Collectors.toList());
     }
 }

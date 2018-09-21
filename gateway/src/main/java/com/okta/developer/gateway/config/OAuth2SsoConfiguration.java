@@ -6,8 +6,10 @@ import org.springframework.boot.autoconfigure.security.oauth2.client.EnableOAuth
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.oauth2.client.OAuth2ClientContext;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
@@ -19,6 +21,8 @@ import org.springframework.web.filter.CorsFilter;
 import io.github.jhipster.security.AjaxLogoutSuccessHandler;
 
 @EnableOAuth2Sso
+@EnableWebSecurity
+@EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
 @Configuration
 public class OAuth2SsoConfiguration extends WebSecurityConfigurerAdapter {
 
@@ -61,7 +65,6 @@ public class OAuth2SsoConfiguration extends WebSecurityConfigurerAdapter {
             .logoutSuccessHandler(ajaxLogoutSuccessHandler())
         .and()
             .authorizeRequests()
-            .antMatchers("/api/profile-info").permitAll()
             .antMatchers("/api/**").authenticated()
             .antMatchers("/management/health").permitAll()
             .antMatchers("/management/**").hasAuthority(AuthoritiesConstants.ADMIN)

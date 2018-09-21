@@ -1,4 +1,4 @@
-/* after changing this file run 'yarn run webpack:build' */
+/* after changing this file run 'npm run webpack:build' */
 /* tslint:disable */
 import '../content/css/vendor.css';
 
@@ -8,6 +8,8 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import {
     faUser,
     faSort,
+    faSortUp,
+    faSortDown,
     faSync,
     faEye,
     faBan,
@@ -43,6 +45,8 @@ import {
 // Adds the SVG icon to the library so you can use it in your page
 library.add(faUser);
 library.add(faSort);
+library.add(faSortUp);
+library.add(faSortDown);
 library.add(faSync);
 library.add(faEye);
 library.add(faBan);

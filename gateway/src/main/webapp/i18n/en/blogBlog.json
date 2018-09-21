@@ -5,7 +5,8 @@
             "home": {
                 "title": "Blogs",
                 "createLabel": "Create a new Blog",
-                "createOrEditLabel": "Create or edit a Blog"
+                "createOrEditLabel": "Create or edit a Blog",
+                "search": "Search for Blog"
             },
             "delete": {
                 "question": "Are you sure you want to delete Blog {{ id }}?"

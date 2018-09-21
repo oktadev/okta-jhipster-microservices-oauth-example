@@ -1,14 +1,23 @@
-import { element, by, promise, ElementFinder } from 'protractor';
+import { element, by, ElementFinder } from 'protractor';
 
 export class ProductComponentsPage {
     createButton = element(by.id('jh-create-entity'));
+    deleteButtons = element.all(by.css('jhi-product div table .btn-danger'));
     title = element.all(by.css('jhi-product div h2#page-heading span')).first();
 
-    clickOnCreateButton(): promise.Promise<void> {
-        return this.createButton.click();
+    async clickOnCreateButton() {
+        await this.createButton.click();
     }
 
-    getTitle(): any {
+    async clickOnLastDeleteButton() {
+        await this.deleteButtons.last().click();
+    }
+
+    async countDeleteButtons() {
+        return this.deleteButtons.count();
+    }
+
+    async getTitle() {
         return this.title.getAttribute('jhiTranslate');
     }
 }
@@ -17,47 +26,60 @@ export class ProductUpdatePage {
     pageTitle = element(by.id('jhi-product-heading'));
     saveButton = element(by.id('save-entity'));
     cancelButton = element(by.id('cancel-save'));
-    nameInput = element(by.id('field_name'));
+    titleInput = element(by.id('field_title'));
     priceInput = element(by.id('field_price'));
     imageInput = element(by.id('file_image'));
 
-    getPageTitle() {
+    async getPageTitle() {
         return this.pageTitle.getAttribute('jhiTranslate');
     }
 
-    setNameInput(name): promise.Promise<void> {
-        return this.nameInput.sendKeys(name);
+    async setTitleInput(title) {
+        await this.titleInput.sendKeys(title);
     }
 
-    getNameInput() {
-        return this.nameInput.getAttribute('value');
+    async getTitleInput() {
+        return this.titleInput.getAttribute('value');
     }
 
-    setPriceInput(price): promise.Promise<void> {
-        return this.priceInput.sendKeys(price);
+    async setPriceInput(price) {
+        await this.priceInput.sendKeys(price);
     }
 
-    getPriceInput() {
+    async getPriceInput() {
         return this.priceInput.getAttribute('value');
     }
 
-    setImageInput(image): promise.Promise<void> {
-        return this.imageInput.sendKeys(image);
+    async setImageInput(image) {
+        await this.imageInput.sendKeys(image);
     }
 
-    getImageInput() {
+    async getImageInput() {
         return this.imageInput.getAttribute('value');
     }
 
-    save(): promise.Promise<void> {
-        return this.saveButton.click();
+    async save() {
+        await this.saveButton.click();
     }
 
-    cancel(): promise.Promise<void> {
-        return this.cancelButton.click();
+    async cancel() {
+        await this.cancelButton.click();
     }
 
     getSaveButton(): ElementFinder {
         return this.saveButton;
+    }
+}
+
+export class ProductDeleteDialog {
+    private dialogTitle = element(by.id('jhi-delete-product-heading'));
+    private confirmButton = element(by.id('jhi-confirm-delete-product'));
+
+    async getDialogTitle() {
+        return this.dialogTitle.getAttribute('jhiTranslate');
+    }
+
+    async clickOnConfirmButton() {
+        await this.confirmButton.click();
     }
 }

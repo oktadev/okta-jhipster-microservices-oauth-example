@@ -10,12 +10,12 @@
                         [(ngModel)]="product.id" readonly />
                 </div>
                 <div class="form-group">
-                    <label class="form-control-label" jhiTranslate="gatewayApp.storeProduct.name" for="field_name">Name</label>
-                    <input type="text" class="form-control" name="name" id="field_name"
-                        [(ngModel)]="product.name" required/>
-                    <div [hidden]="!(editForm.controls.name?.dirty && editForm.controls.name?.invalid)">
+                    <label class="form-control-label" jhiTranslate="gatewayApp.storeProduct.title" for="field_title">Title</label>
+                    <input type="text" class="form-control" name="title" id="field_title"
+                        [(ngModel)]="product.title" required/>
+                    <div [hidden]="!(editForm.controls.title?.dirty && editForm.controls.title?.invalid)">
                         <small class="form-text text-danger"
-                        [hidden]="!editForm.controls.name?.errors?.required" jhiTranslate="entity.validation.required">
+                        [hidden]="!editForm.controls.title?.errors?.required" jhiTranslate="entity.validation.required">
                         This field is required.
                         </small>
                     </div>

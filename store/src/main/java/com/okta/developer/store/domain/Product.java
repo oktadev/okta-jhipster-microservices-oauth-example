@@ -6,12 +6,14 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import javax.validation.constraints.*;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Objects;
 
 /**
  * A Product.
  */
 @Document(collection = "product")
+@org.springframework.data.elasticsearch.annotations.Document(indexName = "product")
 public class Product implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -20,13 +22,13 @@ public class Product implements Serializable {
     private String id;
 
     @NotNull
-    @Field("name")
-    private String name;
+    @Field("title")
+    private String title;
 
     @NotNull
     @DecimalMin(value = "0")
     @Field("price")
-    private Double price;
+    private BigDecimal price;
 
     @Field("image")
     private byte[] image;
@@ -43,29 +45,29 @@ public class Product implements Serializable {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getTitle() {
+        return title;
     }
 
-    public Product name(String name) {
-        this.name = name;
+    public Product title(String title) {
+        this.title = title;
         return this;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
-    public Double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public Product price(Double price) {
+    public Product price(BigDecimal price) {
         this.price = price;
         return this;
     }
 
-    public void setPrice(Double price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 
@@ -120,7 +122,7 @@ public class Product implements Serializable {
     public String toString() {
         return "Product{" +
             "id=" + getId() +
-            ", name='" + getName() + "'" +
+            ", title='" + getTitle() + "'" +
             ", price=" + getPrice() +
             ", image='" + getImage() + "'" +
             ", imageContentType='" + getImageContentType() + "'" +

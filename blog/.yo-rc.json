@@ -1,38 +1,43 @@
 {
   "generator-jhipster": {
-    "promptValues": {
-      "packageName": "com.okta.developer.blog",
-      "nativeLanguage": "en"
-    },
-    "jhipsterVersion": "5.1.0",
     "applicationType": "microservice",
-    "baseName": "blog",
-    "packageName": "com.okta.developer.blog",
-    "packageFolder": "com/okta/developer/blog",
-    "serverPort": "8081",
-    "authenticationType": "oauth2",
-    "cacheProvider": "hazelcast",
-    "enableHibernateCache": true,
-    "websocket": false,
+    "clientPackageManager": "npm",
     "databaseType": "sql",
     "devDatabaseType": "h2Disk",
-    "prodDatabaseType": "postgresql",
-    "searchEngine": false,
-    "messageBroker": false,
-    "serviceDiscoveryType": "eureka",
-    "buildTool": "maven",
+    "enableHibernateCache": true,
     "enableSwaggerCodegen": false,
-    "jwtSecretKey": "ecb37fd4dd502523d0db6d1a518adcaa8e56fa05",
     "enableTranslation": true,
-    "testFrameworks": [],
     "jhiPrefix": "jhi",
-    "clientPackageManager": "yarn",
-    "nativeLanguage": "en",
     "languages": [
-      "en"
+      "en",
+      "fr"
     ],
+    "messageBroker": false,
+    "nativeLanguage": "en",
+    "packageName": "com.okta.developer.blog",
+    "packageFolder": "com/okta/developer/blog",
+    "prodDatabaseType": "postgresql",
+    "searchEngine": "elasticsearch",
+    "serviceDiscoveryType": "eureka",
     "skipClient": true,
+    "skipServer": false,
+    "testFrameworks": [],
+    "useSass": false,
+    "websocket": false,
+    "baseName": "blog",
+    "authenticationType": "oauth2",
+    "serverPort": "8081",
+    "jhipsterVersion": "5.3.4",
+    "buildTool": "maven",
+    "cacheProvider": "hazelcast",
+    "clientFramework": "angularX",
     "skipUserManagement": true,
+    "herokuAppName": "okta-blog",
     "herokuDeployType": "git"
-  }
+  },
+  "entities": [
+    "Blog",
+    "Post",
+    "Tag"
+  ]
 }

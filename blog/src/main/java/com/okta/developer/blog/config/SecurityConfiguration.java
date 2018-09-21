@@ -1,8 +1,10 @@
 package com.okta.developer.blog.config;
 
-import com.okta.developer.blog.security.AuthoritiesConstants;
-import org.springframework.boot.autoconfigure.security.oauth2.resource.*;
-import org.springframework.context.annotation.*;
+import com.okta.developer.blog.security.*;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -14,15 +16,14 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.R
 import org.zalando.problem.spring.web.advice.security.SecurityProblemSupport;
 
 @Configuration
-@Import(SecurityProblemSupport.class)
 @EnableResourceServer
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
+@Import(SecurityProblemSupport.class)
 public class SecurityConfiguration extends ResourceServerConfigurerAdapter {
 
     private final SecurityProblemSupport problemSupport;
 
-    public SecurityConfiguration(ResourceServerProperties resourceServerProperties,
-        SecurityProblemSupport problemSupport) {
+    public SecurityConfiguration(SecurityProblemSupport problemSupport) {
         this.problemSupport = problemSupport;
     }
 
@@ -47,8 +48,9 @@ public class SecurityConfiguration extends ResourceServerConfigurerAdapter {
             .antMatchers("/management/health").permitAll()
             .antMatchers("/management/info").permitAll()
             .antMatchers("/management/**").hasAuthority(AuthoritiesConstants.ADMIN);
+
     }
-    
+
     /**
      * This OAuth2RestTemplate is only used by AuthorizationHeaderUtil that is currently used by TokenRelayRequestInterceptor
      */
@@ -57,5 +59,5 @@ public class SecurityConfiguration extends ResourceServerConfigurerAdapter {
         OAuth2ClientContext oAuth2ClientContext) {
         return new OAuth2RestTemplate(oAuth2ProtectedResourceDetails, oAuth2ClientContext);
     }
-    
+
 }

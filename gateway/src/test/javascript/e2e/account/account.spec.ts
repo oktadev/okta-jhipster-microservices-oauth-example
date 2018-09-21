@@ -1,61 +1,44 @@
 import { browser, element, by, ExpectedConditions as ec } from 'protractor';
-import { NavBarPage, SignInPage } from './../page-objects/jhi-page-objects';
+
+import { NavBarPage, SignInPage } from '../page-objects/jhi-page-objects';
+
+const expect = chai.expect;
 
 describe('account', () => {
     let navBarPage: NavBarPage;
     let signInPage: SignInPage;
 
-    beforeAll(() => {
-        browser.get('/');
-        browser.waitForAngular();
+    before(async () => {
+        await browser.get('/');
         navBarPage = new NavBarPage(true);
-        browser.waitForAngular();
     });
 
-    it('should fail to login with bad password', () => {
-        const expect1 = /home.title/;
-        element
-            .all(by.css('h1'))
-            .first()
-            .getAttribute('jhiTranslate')
-            .then(value => {
-                expect(value).toMatch(expect1);
-            });
-        signInPage = navBarPage.getSignInPage();
-        signInPage.loginWithOAuth('admin', 'foo');
+    it('should fail to login with bad password', async () => {
+        const expect1 = 'home.title';
+        const value1 = await element(by.css('h1')).getAttribute('jhiTranslate');
+        expect(value1).to.eq(expect1);
+        signInPage = await navBarPage.getSignInPage();
+        await signInPage.loginWithOAuth('admin', 'foo');
 
         // Keycloak
-        const alert = element.all(by.css('.alert-error'));
-        alert.isPresent().then(result => {
-            if (result) {
-                expect(alert.first().getText()).toMatch('Invalid username or password.');
-            } else {
-                // Okta
-                const error = element.all(by.css('.infobox-error')).first();
-                browser.wait(ec.visibilityOf(error), 2000).then(() => {
-                    expect(error.getText()).toMatch('Sign in failed!');
-                });
-            }
-        });
+        const alert = element(by.css('.alert-error'));
+        if (await alert.isPresent()) {
+            expect(await alert.getText()).to.eq('Invalid username or password.');
+        } else {
+            // Okta
+            const error = element(by.css('.infobox-error'));
+            expect(await error.getText()).to.eq('Sign in failed!');
+        }
     });
 
-    it('should login successfully with admin account', () => {
-        signInPage.clearUserName();
-        signInPage.setUserName('admin');
-        signInPage.clearPassword();
-        signInPage.setPassword('admin');
-        signInPage.login();
+    it('should login successfully with admin account', async () => {
+        await signInPage.loginWithOAuth('', 'admin');
 
-        browser.waitForAngular();
+        const expect2 = 'home.logged.message';
+        await browser.wait(ec.visibilityOf(element(by.id('home-logged-message'))));
+        const value2 = await element(by.id('home-logged-message')).getAttribute('jhiTranslate');
+        expect(value2).to.eq(expect2);
 
-        const expect2 = /home.logged.message/;
-        const success = element.all(by.css('.alert-success span')).first();
-        browser.wait(ec.visibilityOf(success), 5000).then(() => {
-            success.getAttribute('jhiTranslate').then(value => {
-                expect(value).toMatch(expect2);
-            });
-        });
-
-        navBarPage.autoSignOut();
+        await navBarPage.autoSignOut();
     });
 });
