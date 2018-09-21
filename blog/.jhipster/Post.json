@@ -40,7 +40,7 @@
             "ownerSide": true
         }
     ],
-    "changelogDate": "20180920113017",
+    "changelogDate": "20180921040853",
     "entityTableName": "post",
     "dto": "no",
     "pagination": "infinite-scroll",
@@ -51,5 +51,6 @@
     "applications": [
         "gateway",
         "blog"
-    ]
+    ],
+    "microserviceName": "blog"
 }

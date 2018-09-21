@@ -20,7 +20,7 @@
             "otherEntityRelationshipName": "tag"
         }
     ],
-    "changelogDate": "20180920113018",
+    "changelogDate": "20180921040854",
     "entityTableName": "tag",
     "dto": "no",
     "pagination": "infinite-scroll",
@@ -31,5 +31,6 @@
     "applications": [
         "gateway",
         "blog"
-    ]
+    ],
+    "microserviceName": "blog"
 }

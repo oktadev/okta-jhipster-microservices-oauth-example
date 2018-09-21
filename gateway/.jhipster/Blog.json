@@ -28,7 +28,7 @@
             "otherEntityField": "login"
         }
     ],
-    "changelogDate": "20180920113016",
+    "changelogDate": "20180921040852",
     "entityTableName": "blog",
     "dto": "no",
     "pagination": "no",
@@ -39,5 +39,6 @@
     "applications": [
         "gateway",
         "blog"
-    ]
+    ],
+    "microserviceName": "blog"
 }

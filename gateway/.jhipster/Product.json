@@ -24,7 +24,7 @@
         }
     ],
     "relationships": [],
-    "changelogDate": "20180920113019",
+    "changelogDate": "20180921040855",
     "entityTableName": "product",
     "dto": "no",
     "pagination": "pagination",
@@ -35,5 +35,6 @@
     "applications": [
         "gateway",
         "store"
-    ]
+    ],
+    "microserviceName": "store"
 }

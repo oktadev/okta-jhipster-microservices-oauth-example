@@ -7,10 +7,10 @@
             "jhipster-needle-menu-add-element": "JHipster will add additional menu entries here (do not translate!)",
             "entities": {
                 "main": "Entités",
-                "blog": "Blog",
-                "post": "Post",
-                "tag": "Tag",
-                "product": "Product",
+                "blogBlog": "Blog",
+                "blogPost": "Post",
+                "blogTag": "Tag",
+                "storeProduct": "Product",
                 "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)"
             },
             "account": {
