@@ -1,5 +1,5 @@
 /* tslint:disable no-unused-expression */
-import { browser, ExpectedConditions as ec, protractor } from 'protractor';
+import { browser, ExpectedConditions as ec, protractor, promise } from 'protractor';
 import { NavBarPage, SignInPage } from '../../../page-objects/jhi-page-objects';
 
 import { PostComponentsPage, PostDeleteDialog, PostUpdatePage } from './post.page-object';
@@ -38,14 +38,16 @@ describe('Post e2e test', () => {
         const nbButtonsBeforeCreate = await postComponentsPage.countDeleteButtons();
 
         await postComponentsPage.clickOnCreateButton();
-        await postUpdatePage.setTitleInput('title');
+        await promise.all([
+            postUpdatePage.setTitleInput('title'),
+            postUpdatePage.setContentInput('content'),
+            postUpdatePage.setDateInput('01/01/2001' + protractor.Key.TAB + '02:30AM'),
+            postUpdatePage.blogSelectLastOption()
+            // postUpdatePage.tagSelectLastOption(),
+        ]);
         expect(await postUpdatePage.getTitleInput()).to.eq('title');
-        await postUpdatePage.setContentInput('content');
         expect(await postUpdatePage.getContentInput()).to.eq('content');
-        await postUpdatePage.setDateInput('01/01/2001' + protractor.Key.TAB + '02:30AM');
         expect(await postUpdatePage.getDateInput()).to.contain('2001-01-01T02:30');
-        await postUpdatePage.blogSelectLastOption();
-        // postUpdatePage.tagSelectLastOption();
         await postUpdatePage.save();
         expect(await postUpdatePage.getSaveButton().isPresent()).to.be.false;
 

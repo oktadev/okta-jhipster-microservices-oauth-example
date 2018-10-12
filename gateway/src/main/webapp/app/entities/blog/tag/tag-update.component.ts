@@ -14,7 +14,7 @@ import { PostService } from 'app/entities/blog/post';
     templateUrl: './tag-update.component.html'
 })
 export class TagUpdateComponent implements OnInit {
-    private _tag: ITag;
+    tag: ITag;
     isSaving: boolean;
 
     posts: IPost[];
@@ -82,12 +82,5 @@ export class TagUpdateComponent implements OnInit {
             }
         }
         return option;
-    }
-    get tag() {
-        return this._tag;
-    }
-
-    set tag(tag: ITag) {
-        this._tag = tag;
     }
 }

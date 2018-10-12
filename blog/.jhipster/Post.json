@@ -40,7 +40,7 @@
             "ownerSide": true
         }
     ],
-    "changelogDate": "20180921040853",
+    "changelogDate": "20181011231001",
     "entityTableName": "post",
     "dto": "no",
     "pagination": "infinite-scroll",

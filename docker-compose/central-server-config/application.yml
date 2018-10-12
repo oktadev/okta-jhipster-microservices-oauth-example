@@ -7,7 +7,7 @@ jhipster:
     security:
         authentication:
             jwt:
-                base64-secret: NjBhOTczMTU1NzBkNDc5ZWQ1Nzg5MjFjYTI0ZjQ4MGRjNzExN2VjMjlkZjUzZDZiMjA0OTg4NGQwNjcyYmRiNzM4NjYwMGEwYmQ3MTVjNDdhMjYxNTVmZDM5ZDRiNDc2ZjE2Yg==
+                base64-secret: NzdlNTkzZTA4MjBhNjUxNGM1OGQzMDU4ZWM3ZjRhN2U1MTZmYjlkZWRkN2FkZWNmMjFiY2M4YjVkNDAzZTBmYjFiMjhiYmM2YTZlMWM5NWZkMmRhMTdlYmNmOGQ4MWQ5ZGJlNg==
     logging:
         logstash: # forward logs to ELK
             enabled: true
@@ -20,6 +20,9 @@ spring:
     zipkin:
         base-url: http://jhipster-zipkin:9411
         enabled: true
+    sleuth:
+        sampler:
+            percentage: 1 # report 100% of traces to Zipkin
 
 eureka:
     client:

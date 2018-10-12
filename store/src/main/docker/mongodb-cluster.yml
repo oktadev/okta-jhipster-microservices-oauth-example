@@ -1,7 +1,7 @@
 version: '2'
 services:
     store-mongodb:
-        image: mongo:3.6.3
+        image: mongo:4.0.2
         ports:
             - "27017:27017"
         command: mongos --configdb store-mongodb-config
@@ -11,6 +11,6 @@ services:
             dockerfile: mongodb/MongoDB.Dockerfile
         command: mongod --replSet rs1 --noprealloc --smallfiles
     store-mongodb-config:
-        image: mongo:3.6.3
+        image: mongo:4.0.2
         container_name: store-mongodb-config
         command: mongod --noprealloc --smallfiles --configsvr --dbpath /data/db

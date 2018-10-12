@@ -18,7 +18,7 @@ import { TagService } from 'app/entities/blog/tag';
     templateUrl: './post-update.component.html'
 })
 export class PostUpdateComponent implements OnInit {
-    private _post: IPost;
+    post: IPost;
     isSaving: boolean;
 
     blogs: IBlog[];
@@ -39,6 +39,7 @@ export class PostUpdateComponent implements OnInit {
         this.isSaving = false;
         this.activatedRoute.data.subscribe(({ post }) => {
             this.post = post;
+            this.date = this.post.date != null ? this.post.date.format(DATE_TIME_FORMAT) : null;
         });
         this.blogService.query().subscribe(
             (res: HttpResponse<IBlog[]>) => {
@@ -72,7 +73,7 @@ export class PostUpdateComponent implements OnInit {
 
     save() {
         this.isSaving = true;
-        this.post.date = moment(this.date, DATE_TIME_FORMAT);
+        this.post.date = this.date != null ? moment(this.date, DATE_TIME_FORMAT) : null;
         if (this.post.id !== undefined) {
             this.subscribeToSaveResponse(this.postService.update(this.post));
         } else {
@@ -114,13 +115,5 @@ export class PostUpdateComponent implements OnInit {
             }
         }
         return option;
-    }
-    get post() {
-        return this._post;
-    }
-
-    set post(post: IPost) {
-        this._post = post;
-        this.date = moment(post.date).format(DATE_TIME_FORMAT);
     }
 }

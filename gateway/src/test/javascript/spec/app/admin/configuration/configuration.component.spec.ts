@@ -14,15 +14,17 @@ describe('Component Tests', () => {
         let fixture: ComponentFixture<JhiConfigurationComponent>;
         let service: JhiConfigurationService;
 
-        beforeEach(async(() => {
-            TestBed.configureTestingModule({
-                imports: [GatewayTestModule],
-                declarations: [JhiConfigurationComponent],
-                providers: [JhiConfigurationService]
+        beforeEach(
+            async(() => {
+                TestBed.configureTestingModule({
+                    imports: [GatewayTestModule],
+                    declarations: [JhiConfigurationComponent],
+                    providers: [JhiConfigurationService]
+                })
+                    .overrideTemplate(JhiConfigurationComponent, '')
+                    .compileComponents();
             })
-                .overrideTemplate(JhiConfigurationComponent, '')
-                .compileComponents();
-        }));
+        );
 
         beforeEach(() => {
             fixture = TestBed.createComponent(JhiConfigurationComponent);
