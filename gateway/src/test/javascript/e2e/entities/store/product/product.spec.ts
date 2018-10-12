@@ -1,5 +1,5 @@
 /* tslint:disable no-unused-expression */
-import { browser, ExpectedConditions as ec } from 'protractor';
+import { browser, ExpectedConditions as ec, promise } from 'protractor';
 import { NavBarPage, SignInPage } from '../../../page-objects/jhi-page-objects';
 
 import { ProductComponentsPage, ProductDeleteDialog, ProductUpdatePage } from './product.page-object';
@@ -13,7 +13,8 @@ describe('Product e2e test', () => {
     let productUpdatePage: ProductUpdatePage;
     let productComponentsPage: ProductComponentsPage;
     let productDeleteDialog: ProductDeleteDialog;
-    const fileToUpload = '../../../../../../main/webapp/content/images/logo-jhipster.png';
+    const fileNameToUpload = 'logo-jhipster.png';
+    const fileToUpload = '../../../../../../main/webapp/content/images/' + fileNameToUpload;
     const absolutePath = path.resolve(__dirname, fileToUpload);
 
     before(async () => {
@@ -41,11 +42,14 @@ describe('Product e2e test', () => {
         const nbButtonsBeforeCreate = await productComponentsPage.countDeleteButtons();
 
         await productComponentsPage.clickOnCreateButton();
-        await productUpdatePage.setTitleInput('title');
+        await promise.all([
+            productUpdatePage.setTitleInput('title'),
+            productUpdatePage.setPriceInput('5'),
+            productUpdatePage.setImageInput(absolutePath)
+        ]);
         expect(await productUpdatePage.getTitleInput()).to.eq('title');
-        await productUpdatePage.setPriceInput('5');
         expect(await productUpdatePage.getPriceInput()).to.eq('5');
-        await productUpdatePage.setImageInput(absolutePath);
+        expect(await productUpdatePage.getImageInput()).to.endsWith(fileNameToUpload);
         await productUpdatePage.save();
         expect(await productUpdatePage.getSaveButton().isPresent()).to.be.false;
 

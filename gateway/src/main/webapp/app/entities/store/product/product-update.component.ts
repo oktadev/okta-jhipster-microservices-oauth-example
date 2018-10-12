@@ -12,7 +12,7 @@ import { ProductService } from './product.service';
     templateUrl: './product-update.component.html'
 })
 export class ProductUpdateComponent implements OnInit {
-    private _product: IProduct;
+    product: IProduct;
     isSaving: boolean;
 
     constructor(
@@ -69,12 +69,5 @@ export class ProductUpdateComponent implements OnInit {
 
     private onSaveError() {
         this.isSaving = false;
-    }
-    get product() {
-        return this._product;
-    }
-
-    set product(product: IProduct) {
-        this._product = product;
     }
 }

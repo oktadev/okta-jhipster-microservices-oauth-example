@@ -1,6 +1,5 @@
 {
   "generator-jhipster": {
-    "applicationType": "gateway",
     "clientPackageManager": "npm",
     "databaseType": "sql",
     "devDatabaseType": "h2Disk",
@@ -24,16 +23,17 @@
     "testFrameworks": [
       "protractor"
     ],
-    "useSass": false,
     "websocket": false,
     "baseName": "gateway",
+    "applicationType": "gateway",
     "authenticationType": "oauth2",
-    "jhipsterVersion": "5.3.4",
+    "jhipsterVersion": "5.4.2",
     "buildTool": "maven",
-    "cacheProvider": "ehcache",
-    "clientFramework": "angularX",
-    "serverPort": "8080",
     "skipUserManagement": true,
+    "cacheProvider": "hazelcast",
+    "serverPort": "8080",
+    "clientFramework": "angularX",
+    "useSass": true,
     "herokuAppName": "okta-gateway",
     "herokuDeployType": "git"
   },

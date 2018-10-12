@@ -1,7 +1,7 @@
 version: '2'
 services:
     jhipster-registry:
-        image: jhipster/jhipster-registry:v4.0.3
+        image: jhipster/jhipster-registry:v4.0.4
         volumes:
             - ./central-server-config:/central-config
         # By default the JHipster Registry runs with the "dev" and "native"
@@ -10,8 +10,8 @@ services:
         # http://cloud.spring.io/spring-cloud-config/spring-cloud-config.html
         environment:
             - SPRING_PROFILES_ACTIVE=dev,oauth2
-            - SPRING_SECURITY_USER_PASSWORD=admin
-            - JHIPSTER_REGISTRY_PASSWORD=admin
+            - SPRING_SECURITY_USER_PASSWORD=makeitwork
+            - JHIPSTER_REGISTRY_PASSWORD=makeitwork
             - SPRING_CLOUD_CONFIG_SERVER_COMPOSITE_0_TYPE=native
             - SPRING_CLOUD_CONFIG_SERVER_COMPOSITE_0_SEARCH_LOCATIONS=file:./central-config
             # - SPRING_CLOUD_CONFIG_SERVER_COMPOSITE_0_TYPE=git

@@ -1,7 +1,7 @@
 version: '2'
 services:
     jhipster-registry:
-        image: jhipster/jhipster-registry:v4.0.3
+        image: jhipster/jhipster-registry:v4.0.4
         volumes:
             - ./central-server-config:/central-config
         # When run with the "dev" Spring profile, the JHipster Registry will
@@ -19,10 +19,10 @@ services:
             # - SPRING_CLOUD_CONFIG_SERVER_COMPOSITE_0_URI=https://github.com/jhipster/jhipster-registry/
             # - SPRING_CLOUD_CONFIG_SERVER_COMPOSITE_0_SEARCH_PATHS=central-config
             # For keycloak to work, you need to add '127.0.0.1 keycloak' to your hosts file
-            - SECURITY_OAUTH2_CLIENT_ACCESS_TOKEN_URI=http://keycloak:9080/auth/realms/jhipster/protocol/openid-connect/token
-            - SECURITY_OAUTH2_CLIENT_USER_AUTHORIZATION_URI=http://keycloak:9080/auth/realms/jhipster/protocol/openid-connect/auth
-            - SECURITY_OAUTH2_CLIENT_CLIENT_ID=jhipster-registry
-            - SECURITY_OAUTH2_CLIENT_CLIENT_SECRET=jhipster-registry
-            - SECURITY_OAUTH2_RESOURCE_USER_INFO_URI=http://keycloak:9080/auth/realms/jhipster/protocol/openid-connect/userinfo
+            - SECURITY_OAUTH2_CLIENT_ACCESS_TOKEN_URI=${SECURITY_OAUTH2_CLIENT_ACCESS_TOKEN_URI}
+            - SECURITY_OAUTH2_CLIENT_USER_AUTHORIZATION_URI=${SECURITY_OAUTH2_CLIENT_USER_AUTHORIZATION_URI}
+            - SECURITY_OAUTH2_CLIENT_CLIENT_ID=${SECURITY_OAUTH2_CLIENT_CLIENT_ID}
+            - SECURITY_OAUTH2_CLIENT_CLIENT_SECRET=${SECURITY_OAUTH2_CLIENT_CLIENT_SECRET}
+            - SECURITY_OAUTH2_RESOURCE_USER_INFO_URI=${SECURITY_OAUTH2_RESOURCE_USER_INFO_URI}
         ports:
             - 8761:8761

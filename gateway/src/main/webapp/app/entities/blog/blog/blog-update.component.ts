@@ -13,7 +13,7 @@ import { IUser, UserService } from 'app/core';
     templateUrl: './blog-update.component.html'
 })
 export class BlogUpdateComponent implements OnInit {
-    private _blog: IBlog;
+    blog: IBlog;
     isSaving: boolean;
 
     users: IUser[];
@@ -70,12 +70,5 @@ export class BlogUpdateComponent implements OnInit {
 
     trackUserById(index: number, item: IUser) {
         return item.id;
-    }
-    get blog() {
-        return this._blog;
-    }
-
-    set blog(blog: IBlog) {
-        this._blog = blog;
     }
 }

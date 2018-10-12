@@ -3,34 +3,34 @@ services:
     blog-app:
         image: blog
         environment:
-            - SPRING_PROFILES_ACTIVE=prod,swagger
-            - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://admin:$${jhipster.registry.password}@jhipster-registry:8761/eureka
-            - SPRING_CLOUD_CONFIG_URI=http://admin:$${jhipster.registry.password}@jhipster-registry:8761/config
-            - SPRING_DATASOURCE_URL=jdbc:postgresql://blog-postgresql:5432/blog
+            - 'SPRING_PROFILES_ACTIVE=prod,swagger'
+            - 'EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://admin:$${jhipster.registry.password}@jhipster-registry:8761/eureka'
+            - 'SPRING_CLOUD_CONFIG_URI=http://admin:$${jhipster.registry.password}@jhipster-registry:8761/config'
+            - 'SPRING_DATASOURCE_URL=jdbc:postgresql://blog-postgresql:5432/blog'
             - SECURITY_OAUTH2_CLIENT_CLIENT_ID=${SECURITY_OAUTH2_CLIENT_CLIENT_ID}
             - SECURITY_OAUTH2_CLIENT_CLIENT_SECRET=${SECURITY_OAUTH2_CLIENT_CLIENT_SECRET}
             - SECURITY_OAUTH2_RESOURCE_USER_INFO_URI=${SECURITY_OAUTH2_RESOURCE_USER_INFO_URI}
             - JHIPSTER_SLEEP=30
-            - SPRING_DATA_JEST_URI=http://blog-elasticsearch:9200
-            - JHIPSTER_REGISTRY_PASSWORD=admin
+            - 'SPRING_DATA_JEST_URI=http://blog-elasticsearch:9200'
+            - JHIPSTER_REGISTRY_PASSWORD=makeitwork
     blog-postgresql:
-        image: postgres:10.4
+        image: 'postgres:10.4'
         environment:
             - POSTGRES_USER=blog
             - POSTGRES_PASSWORD=
     blog-elasticsearch:
-        image: elasticsearch:5.6.5
-        command: -Enetwork.host=0.0.0.0 -Ediscovery.type=single-node
+        image: 'elasticsearch:5.6.5'
+        command: '-Enetwork.host=0.0.0.0 -Ediscovery.type=single-node'
         environment:
-            - ES_JAVA_OPTS=-Xms512m -Xmx512m
+            - ES_JAVA_OPTS=-Xms1024m -Xmx1024m
     
     gateway-app:
         image: gateway
         environment:
-            - SPRING_PROFILES_ACTIVE=prod,swagger
-            - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://admin:$${jhipster.registry.password}@jhipster-registry:8761/eureka
-            - SPRING_CLOUD_CONFIG_URI=http://admin:$${jhipster.registry.password}@jhipster-registry:8761/config
-            - SPRING_DATASOURCE_URL=jdbc:postgresql://gateway-postgresql:5432/gateway
+            - 'SPRING_PROFILES_ACTIVE=prod,swagger'
+            - 'EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://admin:$${jhipster.registry.password}@jhipster-registry:8761/eureka'
+            - 'SPRING_CLOUD_CONFIG_URI=http://admin:$${jhipster.registry.password}@jhipster-registry:8761/config'
+            - 'SPRING_DATASOURCE_URL=jdbc:postgresql://gateway-postgresql:5432/gateway'
             - SECURITY_OAUTH2_CLIENT_ACCESS_TOKEN_URI=${SECURITY_OAUTH2_CLIENT_ACCESS_TOKEN_URI}
             - SECURITY_OAUTH2_CLIENT_USER_AUTHORIZATION_URI=${SECURITY_OAUTH2_CLIENT_USER_AUTHORIZATION_URI}
             - SECURITY_OAUTH2_CLIENT_CLIENT_ID=${SECURITY_OAUTH2_CLIENT_CLIENT_ID}
@@ -38,42 +38,42 @@ services:
             - SECURITY_OAUTH2_CLIENT_SCOPE=openid profile email
             - SECURITY_OAUTH2_RESOURCE_USER_INFO_URI=${SECURITY_OAUTH2_RESOURCE_USER_INFO_URI}
             - JHIPSTER_SLEEP=30
-            - SPRING_DATA_JEST_URI=http://gateway-elasticsearch:9200
-            - JHIPSTER_REGISTRY_PASSWORD=admin
+            - 'SPRING_DATA_JEST_URI=http://gateway-elasticsearch:9200'
+            - JHIPSTER_REGISTRY_PASSWORD=makeitwork
         ports:
-            - 8080:8080
+            - '8080:8080'
     gateway-postgresql:
-        image: postgres:10.4
+        image: 'postgres:10.4'
         environment:
             - POSTGRES_USER=gateway
             - POSTGRES_PASSWORD=
     gateway-elasticsearch:
-        image: elasticsearch:5.6.5
-        command: -Enetwork.host=0.0.0.0 -Ediscovery.type=single-node
+        image: 'elasticsearch:5.6.5'
+        command: '-Enetwork.host=0.0.0.0 -Ediscovery.type=single-node'
         environment:
-            - ES_JAVA_OPTS=-Xms512m -Xmx512m
+            - ES_JAVA_OPTS=-Xms1024m -Xmx1024m
     
     store-app:
         image: store
         environment:
-            - SPRING_PROFILES_ACTIVE=prod,swagger
-            - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://admin:$${jhipster.registry.password}@jhipster-registry:8761/eureka
-            - SPRING_CLOUD_CONFIG_URI=http://admin:$${jhipster.registry.password}@jhipster-registry:8761/config
-            - SPRING_DATA_MONGODB_URI=mongodb://store-mongodb:27017
+            - 'SPRING_PROFILES_ACTIVE=prod,swagger'
+            - 'EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://admin:$${jhipster.registry.password}@jhipster-registry:8761/eureka'
+            - 'SPRING_CLOUD_CONFIG_URI=http://admin:$${jhipster.registry.password}@jhipster-registry:8761/config'
+            - 'SPRING_DATA_MONGODB_URI=mongodb://store-mongodb:27017'
             - SPRING_DATA_MONGODB_DATABASE=store
             - SECURITY_OAUTH2_CLIENT_CLIENT_ID=${SECURITY_OAUTH2_CLIENT_CLIENT_ID}
             - SECURITY_OAUTH2_CLIENT_CLIENT_SECRET=${SECURITY_OAUTH2_CLIENT_CLIENT_SECRET}
             - SECURITY_OAUTH2_RESOURCE_USER_INFO_URI=${SECURITY_OAUTH2_RESOURCE_USER_INFO_URI}
             - JHIPSTER_SLEEP=30
-            - SPRING_DATA_JEST_URI=http://store-elasticsearch:9200
-            - JHIPSTER_REGISTRY_PASSWORD=admin
+            - 'SPRING_DATA_JEST_URI=http://store-elasticsearch:9200'
+            - JHIPSTER_REGISTRY_PASSWORD=makeitwork
     store-mongodb:
-        image: mongo:3.6.3
+        image: 'mongo:4.0.2'
     store-elasticsearch:
-        image: elasticsearch:5.6.5
-        command: -Enetwork.host=0.0.0.0 -Ediscovery.type=single-node
+        image: 'elasticsearch:5.6.5'
+        command: '-Enetwork.host=0.0.0.0 -Ediscovery.type=single-node'
         environment:
-            - ES_JAVA_OPTS=-Xms512m -Xmx512m
+            - ES_JAVA_OPTS=-Xms1024m -Xmx1024m
     
     jhipster-registry:
         extends:

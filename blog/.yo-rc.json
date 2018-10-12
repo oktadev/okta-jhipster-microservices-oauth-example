@@ -1,6 +1,5 @@
 {
   "generator-jhipster": {
-    "applicationType": "microservice",
     "clientPackageManager": "npm",
     "databaseType": "sql",
     "devDatabaseType": "h2Disk",
@@ -20,18 +19,16 @@
     "searchEngine": "elasticsearch",
     "serviceDiscoveryType": "eureka",
     "skipClient": true,
-    "skipServer": false,
     "testFrameworks": [],
-    "useSass": false,
     "websocket": false,
     "baseName": "blog",
+    "applicationType": "microservice",
     "authenticationType": "oauth2",
     "serverPort": "8081",
-    "jhipsterVersion": "5.3.4",
+    "jhipsterVersion": "5.4.2",
     "buildTool": "maven",
-    "cacheProvider": "hazelcast",
-    "clientFramework": "angularX",
     "skipUserManagement": true,
+    "cacheProvider": "hazelcast",
     "herokuAppName": "okta-blog",
     "herokuDeployType": "git"
   },

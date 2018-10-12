@@ -13,7 +13,7 @@
       "zipkin"
     ],
     "serviceDiscoveryType": "eureka",
-    "adminPassword": "admin",
-    "jwtSecretKey": "NjBhOTczMTU1NzBkNDc5ZWQ1Nzg5MjFjYTI0ZjQ4MGRjNzExN2VjMjlkZjUzZDZiMjA0OTg4NGQwNjcyYmRiNzM4NjYwMGEwYmQ3MTVjNDdhMjYxNTVmZDM5ZDRiNDc2ZjE2Yg=="
+    "adminPassword": "makeitwork",
+    "jwtSecretKey": "NzdlNTkzZTA4MjBhNjUxNGM1OGQzMDU4ZWM3ZjRhN2U1MTZmYjlkZWRkN2FkZWNmMjFiY2M4YjVkNDAzZTBmYjFiMjhiYmM2YTZlMWM5NWZkMmRhMTdlYmNmOGQ4MWQ5ZGJlNg=="
   }
 }
