@@ -25,7 +25,7 @@ cd okta-jhipster-microservices-oauth-example
 This will get a copy of the project installed locally. To build all the projects as Docker images, run the following command in the `gateway`, `blog`, and `store` directories:
  
 ```bash
-mvn package -Pprod -DskipTests dockerfile:build
+./mvnw package -Pprod jib:dockerBuild
 ```
 
 JHipster ships with [Keycloak](https://keycloak.org) configured for OAuth by default. To configure your apps to work with Okta, you'll first need to [create a free developer account](https://developer.okta.com/signup/). After doing so, you'll get your own Okta domain, that has a name like `https://dev-123456.oktapreview.com`. 
